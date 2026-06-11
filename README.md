@@ -1,0 +1,1 @@
+# aplica-o-de-divis-o-de-tarefas
