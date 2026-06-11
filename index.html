@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#F7F6F2">
+<title>Nossa Casa 🏠</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --edu:      #7C6AF5;
+  --edu-soft: #EDE9FF;
+  --ana:      #F5886A;
+  --ana-soft: #FFEEEC;
+  --lea:      #3DB89A;
+  --lea-soft: #E0F7F3;
+  --bg:       #F2F1ED;
+  --surface:  #FFFFFF;
+  --border:   #E5E3DC;
+  --text:     #18181B;
+  --muted:    #8A8880;
+  --danger:   #EF4444;
+  --success:  #22C55E;
+  --warning:  #F59E0B;
+  --radius:   16px;
+  --nav-h:    64px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px 12px;
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.topbar-left h1 { font-size: 20px; font-weight: 700; letter-spacing: -.4px; }
+.topbar-left p  { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 1px; }
+.topbar-sync {
+  width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: var(--bg); cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .4s;
+}
+.topbar-sync.spinning { animation: spin .6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── NAV ── */
+.nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  background: var(--surface); border-top: 1px solid var(--border);
+  display: flex; height: var(--nav-h);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.nav-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 3px; border: none; background: none;
+  cursor: pointer; padding: 8px 4px; transition: opacity .15s;
+}
+.nav-btn .n-icon { font-size: 22px; line-height: 1; }
+.nav-btn .n-label { font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: .3px; text-transform: uppercase; }
+.nav-btn.active .n-label { color: var(--text); }
+
+/* ── SCREENS ── */
+.screen { display: none; padding: 20px; animation: fadeIn .2s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ── SECTION LABEL ── */
+.sec-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.4px;
+  color: var(--muted); text-transform: uppercase; margin: 24px 0 10px;
+}
+.sec-label:first-child { margin-top: 0; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 10px; overflow: hidden;
+}
+.card-pad { padding: 16px; }
+
+/* ── HOME STATS ── */
+.stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 12px; text-align: center;
+}
+.stat-num { font-size: 28px; font-weight: 700; line-height: 1; }
+.stat-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+
+/* ── PERSON PILL (select) ── */
+.person-bar { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 2px; }
+.person-bar::-webkit-scrollbar { display: none; }
+.p-pill {
+  padding: 8px 18px; border-radius: 20px; border: 2px solid var(--border);
+  background: none; font-family: 'DM Sans', sans-serif; font-size: 14px;
+  font-weight: 600; cursor: pointer; white-space: nowrap; transition: all .15s;
+  flex-shrink: 0;
+}
+.p-pill.active { color: #fff; border-color: transparent; }
+
+/* ── TASK LIST ── */
+.task-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background .1s;
+}
+.task-row:last-child { border-bottom: none; }
+.task-row:active { background: var(--bg); }
+.task-check {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; transition: all .2s;
+}
+.task-check.done { border-color: transparent; color: white; }
+.task-label { flex: 1; font-size: 15px; }
+.task-label.done { text-decoration: line-through; color: var(--muted); }
+.task-actions { display: flex; gap: 6px; }
+.icon-btn {
+  width: 30px; height: 30px; border-radius: 8px; border: none;
+  background: var(--bg); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── PROGRESS BAR ── */
+.prog-wrap { height: 3px; background: var(--border); margin: 0 16px 12px; border-radius: 2px; }
+.prog-fill  { height: 100%; border-radius: 2px; transition: width .4s ease; }
+
+/* ── ADD ROW ── */
+.add-row {
+  display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+.add-input {
+  flex: 1; border: none; outline: none; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; background: none; color: var(--text);
+}
+.add-input::placeholder { color: var(--muted); }
+.add-btn {
+  padding: 6px 14px; border-radius: 20px; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; color: white; background: var(--text); transition: opacity .15s;
+}
+.add-btn:disabled { opacity: .4; }
+
+/* ── LEMBRETE ROW ── */
+.lem-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 13px 16px; border-bottom: 1px solid var(--border);
+}
+.lem-row:last-child { border-bottom: none; }
+.lem-icon { font-size: 20px; flex-shrink: 0; padding-top: 1px; }
+.lem-body { flex: 1; }
+.lem-text { font-size: 15px; font-weight: 500; }
+.lem-text.done { text-decoration: line-through; color: var(--muted); }
+.lem-who  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.lem-check {
+  width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--border);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; transition: all .2s; flex-shrink: 0;
+}
+.lem-check.done { background: var(--success); border-color: var(--success); color: white; }
+
+/* ── SHOPPING ── */
+.shop-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; border-bottom: 1px solid var(--border);
+}
+.shop-row:last-child { border-bottom: none; }
+.shop-check {
+  width: 26px; height: 26px; border-radius: 6px; border: 2px solid var(--border);
+  flex-shrink: 0; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 13px; transition: all .2s;
+}
+.shop-check.done { background: var(--success); border-color: var(--success); color: white; }
+.shop-label { flex: 1; font-size: 15px; }
+.hist-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px; border-bottom: 1px solid var(--border); opacity: .7;
+}
+.hist-row:last-child { border-bottom: none; }
+.hist-label { flex: 1; font-size: 14px; text-decoration: line-through; color: var(--muted); }
+.hist-meta  { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; text-align: right; line-height: 1.4; }
+
+/* ── MACHINE ── */
+.machine-hero {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 18px;
+}
+.machine-emoji { font-size: 48px; line-height: 1; }
+.machine-title { font-size: 18px; font-weight: 700; }
+.machine-sub   { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+.day-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 8px; overflow: hidden; }
+.day-head { padding: 12px 16px; font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--border); background: var(--bg); }
+.slots-row { display: flex; gap: 8px; padding: 12px 16px; flex-wrap: wrap; }
+.slot-btn {
+  padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  cursor: pointer; background: none; color: var(--muted); transition: all .2s;
+}
+.slot-btn.taken { border-color: transparent; color: white; }
+.slot-btn.free  { background: #F0FDF4; border-color: #BBF7D0; color: #16A34A; }
+
+/* ── REGRAS ── */
+.regra-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 15px 16px; margin-bottom: 8px;
+  display: flex; gap: 14px; align-items: flex-start;
+  cursor: pointer; transition: background .15s;
+}
+.regra-card:active { background: var(--bg); }
+.regra-card.important { background: #FFFBEB; border-color: #FDE68A; }
+.regra-num { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); flex-shrink: 0; padding-top: 2px; min-width: 22px; }
+.regra-text { font-size: 14px; line-height: 1.55; flex: 1; }
+.regra-del { background: none; border: none; cursor: pointer; font-size: 16px; opacity: .5; padding: 2px; }
+
+.add-regra-wrap { margin-top: 12px; }
+.add-regra-input {
+  width: 100%; padding: 14px; border: 1.5px dashed var(--border);
+  border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+  outline: none; background: none; color: var(--text); resize: none;
+  transition: border-color .2s;
+}
+.add-regra-input:focus { border-color: var(--text); }
+.add-regra-row { display: flex; gap: 8px; margin-top: 8px; }
+.btn-regra {
+  padding: 10px 20px; border-radius: 12px; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: opacity .15s;
+}
+.btn-regra-ok  { background: var(--text); color: white; }
+.btn-regra-imp { background: #FDE68A; color: #92400E; }
+
+/* ── HOME LEMBRETE MINI ── */
+.mini-lem {
+  display: flex; align-items: center; gap: 10px; padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.mini-lem:last-child { border-bottom: none; }
+.mini-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.mini-text { font-size: 14px; flex: 1; }
+.mini-who  { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--muted); }
+
+/* ── MODAL ── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200;
+  display: none; align-items: flex-end; justify-content: center;
+}
+.overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border-radius: 24px 24px 0 0; padding: 20px;
+  width: 100%; max-width: 500px; max-height: 88dvh; overflow-y: auto;
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+}
+.modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 18px; }
+.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+.modal-input {
+  width: 100%; padding: 13px; border: 1.5px solid var(--border);
+  border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px;
+  outline: none; margin-bottom: 12px; color: var(--text);
+}
+.modal-input:focus { border-color: var(--edu); }
+.modal-label { font-size: 12px; font-weight: 700; letter-spacing: .8px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+.chips-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.chip {
+  padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border);
+  background: none; font-family: 'DM Sans', sans-serif; font-size: 14px;
+  font-weight: 600; cursor: pointer; transition: all .15s;
+}
+.chip.sel { color: white; border-color: transparent; }
+.btn-full {
+  width: 100%; padding: 15px; border-radius: 14px; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600;
+  cursor: pointer; background: var(--text); color: white; margin-top: 4px;
+}
+.btn-ghost {
+  width: 100%; padding: 13px; border-radius: 14px; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--muted);
+  background: none; cursor: pointer; margin-top: 6px;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--text); color: white; padding: 10px 20px; border-radius: 20px;
+  font-size: 14px; font-weight: 500; z-index: 300; opacity: 0;
+  transition: all .3s; pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── LOADING ── */
+.loading {
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px; color: var(--muted); font-size: 14px; gap: 10px;
+}
+.spinner {
+  width: 20px; height: 20px; border: 2px solid var(--border);
+  border-top-color: var(--text); border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <h1>🏠 Nossa Casa</h1>
+    <p id="top-date"></p>
+  </div>
+  <button class="topbar-sync" id="sync-btn" onclick="syncAll()" title="Sincronizar">🔄</button>
+</div>
+
+<!-- ═══════════════════════════════ SCREENS ═══════════════════════════════ -->
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num" id="stat-feitas" style="color:var(--success)">–</div>
+      <div class="stat-lbl">Feitas hoje</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-pendentes" style="color:var(--warning)">–</div>
+      <div class="stat-lbl">Pendentes</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="stat-lembretes" style="color:var(--edu)">–</div>
+      <div class="stat-lbl">Lembretes</div>
+    </div>
+  </div>
+
+  <div class="sec-label">Tarefas por pessoa</div>
+  <div id="home-people-summary"></div>
+
+  <div class="sec-label">Lembretes ativos</div>
+  <div class="card" id="home-lembretes-list">
+    <div class="loading"><div class="spinner"></div> Carregando...</div>
+  </div>
+
+  <div class="sec-label">Lista de compras — pendentes</div>
+  <div class="card" id="home-shop-list">
+    <div class="loading"><div class="spinner"></div> Carregando...</div>
+  </div>
+</div>
+
+<!-- TAREFAS -->
+<div class="screen" id="screen-tarefas">
+  <div class="person-bar" id="task-person-bar">
+    <button class="p-pill" data-p="Eduarda"   onclick="selectTaskPerson('Eduarda',   this)">Eduarda</button>
+    <button class="p-pill" data-p="Ana Luisa" onclick="selectTaskPerson('Ana Luisa', this)">Ana Luisa</button>
+    <button class="p-pill" data-p="Leander"   onclick="selectTaskPerson('Leander',   this)">Leander</button>
+  </div>
+  <div id="task-content">
+    <div style="text-align:center;color:var(--muted);padding:40px 0;font-size:15px;">
+      Escolha uma pessoa acima ☝️
+    </div>
+  </div>
+</div>
+
+<!-- LEMBRETES -->
+<div class="screen" id="screen-lembretes">
+  <div class="sec-label">Lembretes & tarefas rotativas</div>
+  <div class="card" id="lem-list"></div>
+  <button class="add-btn" style="margin-top:12px;padding:13px 0;width:100%;border-radius:14px;font-size:15px;background:var(--text)" onclick="openLemModal()">+ Novo lembrete</button>
+</div>
+
+<!-- COMPRAS -->
+<div class="screen" id="screen-compras">
+  <div class="sec-label">Lista de compras</div>
+  <div class="card" id="shop-list"></div>
+  <div class="card" style="margin-top:0" id="shop-add-wrap">
+    <div class="add-row">
+      <input class="add-input" id="shop-input" placeholder="Adicionar item..." onkeydown="if(event.key==='Enter')addShopItem()">
+      <button class="add-btn" onclick="addShopItem()">Adicionar</button>
+    </div>
+  </div>
+
+  <div class="sec-label" style="margin-top:24px">Histórico de compras</div>
+  <div class="card" id="shop-hist"></div>
+</div>
+
+<!-- MÁQUINA -->
+<div class="screen" id="screen-maquina">
+  <div class="machine-hero">
+    <div class="machine-emoji">🫧</div>
+    <div>
+      <div class="machine-title">Máquina de Lavar</div>
+      <div class="machine-sub">Reserve seu horário — reseta toda semana</div>
+    </div>
+  </div>
+  <div id="machine-grid"></div>
+</div>
+
+<!-- REGRAS -->
+<div class="screen" id="screen-regras">
+  <div class="sec-label">Regras da casa</div>
+  <div id="regras-list"></div>
+  <div class="add-regra-wrap">
+    <textarea class="add-regra-input" id="regra-input" rows="2" placeholder="Escrever nova regra..."></textarea>
+    <div class="add-regra-row">
+      <button class="btn-regra btn-regra-ok"  onclick="addRegra(false)">Adicionar</button>
+      <button class="btn-regra btn-regra-imp" onclick="addRegra(true)">⚠️ Importante</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ NAV ═══════════════════════════════ -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="goScreen('home',this)">
+    <span class="n-icon">🏠</span><span class="n-label">Home</span>
+  </button>
+  <button class="nav-btn" onclick="goScreen('tarefas',this)">
+    <span class="n-icon">✅</span><span class="n-label">Tarefas</span>
+  </button>
+  <button class="nav-btn" onclick="goScreen('lembretes',this)">
+    <span class="n-icon">🔔</span><span class="n-label">Lembretes</span>
+  </button>
+  <button class="nav-btn" onclick="goScreen('compras',this)">
+    <span class="n-icon">🛒</span><span class="n-label">Compras</span>
+  </button>
+  <button class="nav-btn" onclick="goScreen('maquina',this)">
+    <span class="n-icon">🫧</span><span class="n-label">Máquina</span>
+  </button>
+  <button class="nav-btn" onclick="goScreen('regras',this)">
+    <span class="n-icon">📋</span><span class="n-label">Regras</span>
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════ MODALS ═══════════════════════════════ -->
+
+<!-- Lembrete Modal -->
+<div class="overlay" id="lem-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="lem-modal-title">Novo lembrete</div>
+    <input class="modal-input" id="lem-text-input" placeholder="Ex: Tirar o lixo, comprar sabão...">
+    <div class="modal-label">Responsável</div>
+    <div class="chips-row" id="lem-who-chips">
+      <button class="chip" data-v="Eduarda"   onclick="selChip(this,'lem-who-chips')">Eduarda</button>
+      <button class="chip" data-v="Ana Luisa" onclick="selChip(this,'lem-who-chips')">Ana Luisa</button>
+      <button class="chip" data-v="Leander"   onclick="selChip(this,'lem-who-chips')">Leander</button>
+      <button class="chip" data-v="Todos"     onclick="selChip(this,'lem-who-chips')">Todos</button>
+    </div>
+    <button class="btn-full" onclick="saveLembrete()">Salvar</button>
+    <button class="btn-ghost" onclick="closeModal('lem-modal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- Slot Modal -->
+<div class="overlay" id="slot-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="slot-modal-title">Reservar horário</div>
+    <div class="modal-label">Quem vai usar?</div>
+    <div class="chips-row" id="slot-who-chips">
+      <button class="chip" data-v="Eduarda"   onclick="selChip(this,'slot-who-chips')">Eduarda</button>
+      <button class="chip" data-v="Ana Luisa" onclick="selChip(this,'slot-who-chips')">Ana Luisa</button>
+      <button class="chip" data-v="Leander"   onclick="selChip(this,'slot-who-chips')">Leander</button>
+    </div>
+    <button class="btn-full" onclick="confirmSlot()">Reservar</button>
+    <button class="btn-ghost" id="slot-cancel-btn" onclick="cancelSlot()" style="color:var(--danger)">Cancelar reserva</button>
+    <button class="btn-ghost" onclick="closeModal('slot-modal')">Fechar</button>
+  </div>
+</div>
+
+<!-- Compra — quem comprou -->
+<div class="overlay" id="shop-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Quem comprou? <span id="shop-modal-item" style="color:var(--muted);font-weight:400"></span></div>
+    <div class="chips-row" id="shop-who-chips">
+      <button class="chip" data-v="Eduarda"   onclick="selChip(this,'shop-who-chips')">Eduarda</button>
+      <button class="chip" data-v="Ana Luisa" onclick="selChip(this,'shop-who-chips')">Ana Luisa</button>
+      <button class="chip" data-v="Leander"   onclick="selChip(this,'shop-who-chips')">Leander</button>
+    </div>
+    <button class="btn-full" onclick="confirmBought()">Confirmar compra</button>
+    <button class="btn-ghost" onclick="closeModal('shop-modal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════ FIREBASE + JS ═══════════════════════════════ -->
+<script type="module">
+import { initializeApp }                      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getDatabase, ref, onValue, set, push, update, remove, get }
+                                               from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+// ── CONFIG ──
+const firebaseConfig = {
+  apiKey:            "AIzaSyCJlJ_P9AnOCe11qCE52MM0sb1xiIxG8tw",
+  authDomain:        "casa-89d01.firebaseapp.com",
+  databaseURL:       "https://casa-89d01-default-rtdb.firebaseio.com",
+  projectId:         "casa-89d01",
+  storageBucket:     "casa-89d01.firebasestorage.app",
+  messagingSenderId: "69415546392",
+  appId:             "1:69415546392:web:9b6437d428c61d5e88dd6d"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+// ── PEOPLE ──
+const PEOPLE = {
+  'Eduarda':   { color: '#7C6AF5', soft: '#EDE9FF', emoji: '💜' },
+  'Ana Luisa': { color: '#F5886A', soft: '#FFEEEC', emoji: '🧡' },
+  'Leander':   { color: '#3DB89A', soft: '#E0F7F3', emoji: '💚' },
+};
+const ALL_PEOPLE = Object.keys(PEOPLE);
+const WEEK_DAYS  = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
+const SLOTS      = ['Manhã','Tarde','Noite'];
+
+// ── STATE (live) ──
+let liveData = { tasks: {}, lembretes: {}, shopping: {}, history: {}, machine: {}, regras: {} };
+
+// ── DATE HELPERS ──
+function todayStr() {
+  return new Date().toLocaleDateString('pt-BR');
+}
+function getWeekKey() {
+  const d   = new Date();
+  const jan = new Date(d.getFullYear(), 0, 1);
+  const w   = Math.ceil(((d - jan) / 86400000 + jan.getDay() + 1) / 7);
+  return `${d.getFullYear()}-W${w}`;
+}
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+}
+
+// Set topbar date
+document.getElementById('top-date').textContent =
+  new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+
+// ── SCREEN NAV ──
+window.goScreen = function(name, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  btn.classList.add('active');
+};
+
+// ── TOAST ──
+window.toast = function(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+};
+
+// ── SYNC BUTTON ──
+window.syncAll = function() {
+  const btn = document.getElementById('sync-btn');
+  btn.classList.add('spinning');
+  setTimeout(() => btn.classList.remove('spinning'), 600);
+  toast('Sincronizado! ✓');
+};
+
+// ── CHIP SELECTOR ──
+window.selChip = function(el, groupId) {
+  document.querySelectorAll(`#${groupId} .chip`).forEach(c => {
+    c.classList.remove('sel');
+    c.style.background = '';
+    c.style.color = '';
+  });
+  el.classList.add('sel');
+  const p = PEOPLE[el.dataset.v];
+  el.style.background = p ? p.color : '#6B7280';
+  el.style.color = 'white';
+};
+function getChipVal(groupId) {
+  const sel = document.querySelector(`#${groupId} .chip.sel`);
+  return sel ? sel.dataset.v : null;
+}
+
+// ─────────────────────────────────────────────
+//  FIREBASE INIT — seed defaults if empty
+// ─────────────────────────────────────────────
+async function seedIfEmpty() {
+  const snap = await get(ref(db, 'tasks'));
+  if (snap.exists()) return;
+
+  const defaultTasks = {
+    'Eduarda': [
+      { text: 'Limpar banheiro',         done: false, icon: '🚿' },
+      { text: 'Esfregar o vaso',         done: false, icon: '🧴' },
+      { text: 'Lavar espelho e pia',     done: false, icon: '🪥' },
+      { text: 'Trocar toalhas',          done: false, icon: '🧺' },
+    ],
+    'Ana Luisa': [
+      { text: 'Limpar bancada',          done: false, icon: '🍽️' },
+      { text: 'Limpar fogão e forno',    done: false, icon: '🔥' },
+      { text: 'Organizar geladeira',     done: false, icon: '🧊' },
+      { text: 'Varrer chão da cozinha',  done: false, icon: '🧹' },
+    ],
+    'Leander': [
+      { text: 'Limpar sala de estar',    done: false, icon: '🛋️' },
+      { text: 'Limpar corredor',         done: false, icon: '🚪' },
+      { text: 'Aspirar tapetes',         done: false, icon: '💨' },
+      { text: 'Organizar objetos da sala', done: false, icon: '📦' },
+    ]
+  };
+
+  for (const [person, tasks] of Object.entries(defaultTasks)) {
+    for (const task of tasks) {
+      await push(ref(db, `tasks/${safeKey(person)}`), { ...task, createdAt: new Date().toISOString() });
+    }
+  }
+
+  const defaultRegras = [
+    { text: 'Cada uma lava, seca e guarda sua própria louça no mesmo dia.', important: true },
+    { text: 'Cada uma cuida da limpeza da sua área pelo menos uma vez por semana.' },
+    { text: 'Reservas da máquina devem ser feitas no app. Quem não reservou respeita quem reservou.', important: true },
+    { text: 'Produtos coletivos são divididos igualmente. Avise quando estiver acabando!' },
+    { text: 'Lixo deve ser tirado quando o saco encher.' },
+    { text: 'Convidados são bem-vindos, mas avise com antecedência.' },
+    { text: 'Barulho reduzido após as 22h. Fones sempre bem-vindos! 🎧' },
+    { text: 'Mantimentos pessoais identificados não devem ser usados sem permissão.', important: true },
+    { text: 'Problemas na casa (vazamento, etc.) devem ser reportados no grupo imediatamente.' },
+    { text: 'Respeito é a regra nº1. Em caso de conflito, conversa direta primeiro. 💬', important: true },
+  ];
+  for (const r of defaultRegras) {
+    await push(ref(db, 'regras'), { ...r, createdAt: new Date().toISOString() });
+  }
+}
+
+function safeKey(str) { return str.replace(/\s/g, '_'); }
+function fromKey(str) { return str.replace(/_/g, ' '); }
+
+// ─────────────────────────────────────────────
+//  LISTENERS
+// ─────────────────────────────────────────────
+function startListeners() {
+  // TASKS
+  onValue(ref(db, 'tasks'), snap => {
+    liveData.tasks = snap.val() || {};
+    renderTaskContent();
+    renderHomeStats();
+    renderHomePeople();
+  });
+
+  // LEMBRETES
+  onValue(ref(db, 'lembretes'), snap => {
+    liveData.lembretes = snap.val() || {};
+    renderLembretes();
+    renderHomeLembretes();
+  });
+
+  // SHOPPING
+  onValue(ref(db, 'shopping'), snap => {
+    liveData.shopping = snap.val() || {};
+    renderShopping();
+    renderHomeShop();
+  });
+
+  // HISTORY
+  onValue(ref(db, 'history'), snap => {
+    liveData.history = snap.val() || {};
+    renderHistory();
+  });
+
+  // MACHINE
+  onValue(ref(db, 'machine'), snap => {
+    liveData.machine = snap.val() || {};
+    renderMachine();
+  });
+
+  // REGRAS
+  onValue(ref(db, 'regras'), snap => {
+    liveData.regras = snap.val() || {};
+    renderRegras();
+  });
+}
+
+// ─────────────────────────────────────────────
+//  HOME
+// ─────────────────────────────────────────────
+function renderHomeStats() {
+  let total = 0, feitas = 0;
+  Object.values(liveData.tasks).forEach(personTasks => {
+    Object.values(personTasks || {}).forEach(t => { total++; if (t.done) feitas++; });
+  });
+  const lem = Object.values(liveData.lembretes).filter(l => !l.done).length;
+  document.getElementById('stat-feitas').textContent    = feitas;
+  document.getElementById('stat-pendentes').textContent = total - feitas;
+  document.getElementById('stat-lembretes').textContent = lem;
+}
+
+function renderHomePeople() {
+  const c = document.getElementById('home-people-summary');
+  c.innerHTML = '';
+  ALL_PEOPLE.forEach(person => {
+    const p     = PEOPLE[person];
+    const key   = safeKey(person);
+    const tasks = Object.values(liveData.tasks[key] || {});
+    if (!tasks.length) return;
+    const done = tasks.filter(t => t.done).length;
+    const pct  = Math.round(done / tasks.length * 100);
+    const card = document.createElement('div');
+    card.className = 'card'; card.style.marginBottom = '10px';
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 16px">
+        <div style="width:40px;height:40px;border-radius:50%;background:${p.soft};color:${p.color};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">${p.emoji}</div>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:600">${person}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${done} de ${tasks.length} tarefas feitas</div>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:${p.color}">${pct}%</div>
+      </div>
+      <div style="height:3px;background:var(--border);margin:0 16px 14px;border-radius:2px">
+        <div style="height:100%;width:${pct}%;background:${p.color};border-radius:2px;transition:width .4s"></div>
+      </div>`;
+    c.appendChild(card);
+  });
+}
+
+function renderHomeLembretes() {
+  const c = document.getElementById('home-lembretes-list');
+  const active = Object.entries(liveData.lembretes).filter(([,l]) => !l.done);
+  if (!active.length) { c.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:14px;text-align:center">Nenhum lembrete pendente ✓</div>'; return; }
+  c.innerHTML = active.slice(0, 5).map(([, l]) => {
+    const p = PEOPLE[l.who];
+    return `<div class="mini-lem">
+      <div class="mini-dot" style="background:${p ? p.color : '#6B7280'}"></div>
+      <div class="mini-text">${l.text}</div>
+      <div class="mini-who">${l.who}</div>
+    </div>`;
+  }).join('');
+  if (active.length > 5) c.innerHTML += `<div style="padding:10px 14px;font-size:12px;color:var(--muted)">+${active.length-5} mais...</div>`;
+}
+
+function renderHomeShop() {
+  const c = document.getElementById('home-shop-list');
+  const pending = Object.entries(liveData.shopping).filter(([,s]) => !s.bought);
+  if (!pending.length) { c.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:14px;text-align:center">Lista vazia ✓</div>'; return; }
+  c.innerHTML = pending.slice(0, 5).map(([, s]) => `
+    <div class="mini-lem">
+      <div class="mini-dot" style="background:var(--success)"></div>
+      <div class="mini-text">${s.item}</div>
+    </div>`).join('');
+  if (pending.length > 5) c.innerHTML += `<div style="padding:10px 14px;font-size:12px;color:var(--muted)">+${pending.length-5} mais...</div>`;
+}
+
+// ─────────────────────────────────────────────
+//  TASKS
+// ─────────────────────────────────────────────
+let currentTaskPerson = null;
+
+window.selectTaskPerson = function(person, btn) {
+  document.querySelectorAll('#task-person-bar .p-pill').forEach(p => {
+    p.classList.remove('active'); p.style.background = ''; p.style.color = '';
+  });
+  btn.classList.add('active');
+  btn.style.background = PEOPLE[person].color;
+  btn.style.color = 'white';
+  currentTaskPerson = person;
+  renderTaskContent();
+};
+
+function renderTaskContent() {
+  if (!currentTaskPerson) return;
+  const p     = PEOPLE[currentTaskPerson];
+  const key   = safeKey(currentTaskPerson);
+  const tasks = Object.entries(liveData.tasks[key] || {});
+  const done  = tasks.filter(([,t]) => t.done).length;
+  const pct   = tasks.length ? Math.round(done / tasks.length * 100) : 0;
+
+  const c = document.getElementById('task-content');
+  c.innerHTML = `
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 16px 10px">
+        <div style="width:42px;height:42px;border-radius:50%;background:${p.soft};color:${p.color};display:flex;align-items:center;justify-content:center;font-size:20px">${p.emoji}</div>
+        <div style="flex:1">
+          <div style="font-size:16px;font-weight:700">${currentTaskPerson}</div>
+          <div style="font-size:12px;color:var(--muted)">${done}/${tasks.length} concluídas</div>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:${p.color}">${pct}%</div>
+      </div>
+      <div class="prog-wrap"><div class="prog-fill" style="width:${pct}%;background:${p.color}"></div></div>
+      <div id="task-rows">
+        ${tasks.length ? tasks.map(([id, t]) => taskRowHTML(id, t, p)).join('') : '<div style="padding:16px;color:var(--muted);font-size:14px;text-align:center">Nenhuma tarefa. Adicione abaixo ↓</div>'}
+      </div>
+      <div class="add-row" style="border-top:1px solid var(--border)">
+        <input class="add-input" id="new-task-input" placeholder="Nova tarefa..." onkeydown="if(event.key==='Enter')addTask()">
+        <button class="add-btn" style="background:${p.color}" onclick="addTask()">Add</button>
+      </div>
+    </div>`;
+}
+
+function taskRowHTML(id, t, p) {
+  return `<div class="task-row" onclick="toggleTask('${safeKey(currentTaskPerson)}','${id}')">
+    <div class="task-check ${t.done?'done':''}" style="${t.done?`background:${p.color}`:''}">
+      ${t.done ? '✓' : ''}
+    </div>
+    <span class="task-label ${t.done?'done':''}">${t.icon||'📌'} ${t.text}</span>
+    <div class="task-actions" onclick="event.stopPropagation()">
+      <button class="icon-btn" onclick="deleteTask('${safeKey(currentTaskPerson)}','${id}')" title="Apagar">🗑️</button>
+    </div>
+  </div>`;
+}
+
+window.toggleTask = function(personKey, id) {
+  const task = liveData.tasks[personKey]?.[id];
+  if (!task) return;
+  update(ref(db, `tasks/${personKey}/${id}`), { done: !task.done });
+};
+
+window.addTask = function() {
+  const input = document.getElementById('new-task-input');
+  const text  = input.value.trim();
+  if (!text || !currentTaskPerson) return;
+  const key = safeKey(currentTaskPerson);
+  push(ref(db, `tasks/${key}`), { text, done: false, icon: '📌', createdAt: new Date().toISOString() });
+  input.value = '';
+  toast('Tarefa adicionada ✓');
+};
+
+window.deleteTask = function(personKey, id) {
+  if (!confirm('Apagar esta tarefa?')) return;
+  remove(ref(db, `tasks/${personKey}/${id}`));
+  toast('Tarefa removida');
+};
+
+// ─────────────────────────────────────────────
+//  LEMBRETES
+// ─────────────────────────────────────────────
+let editingLemId = null;
+
+window.openLemModal = function(id) {
+  editingLemId = id || null;
+  const modal  = document.getElementById('lem-modal');
+  const titleEl = document.getElementById('lem-modal-title');
+  document.getElementById('lem-text-input').value = '';
+  document.querySelectorAll('#lem-who-chips .chip').forEach(c => { c.classList.remove('sel'); c.style.background=''; c.style.color=''; });
+
+  if (id) {
+    const l = liveData.lembretes[id];
+    titleEl.textContent = 'Editar lembrete';
+    document.getElementById('lem-text-input').value = l.text;
+    const chip = document.querySelector(`#lem-who-chips .chip[data-v="${l.who}"]`);
+    if (chip) selChip(chip, 'lem-who-chips');
+  } else {
+    titleEl.textContent = 'Novo lembrete';
+  }
+  modal.classList.add('open');
+};
+
+window.saveLembrete = function() {
+  const text = document.getElementById('lem-text-input').value.trim();
+  const who  = getChipVal('lem-who-chips');
+  if (!text || !who) { toast('Preencha tudo!'); return; }
+
+  if (editingLemId) {
+    update(ref(db, `lembretes/${editingLemId}`), { text, who });
+    toast('Lembrete atualizado ✓');
+  } else {
+    push(ref(db, 'lembretes'), { text, who, done: false, icon: '🔔', createdAt: new Date().toISOString() });
+    toast('Lembrete adicionado ✓');
+  }
+  closeModal('lem-modal');
+};
+
+function renderLembretes() {
+  const c = document.getElementById('lem-list');
+  const entries = Object.entries(liveData.lembretes);
+  if (!entries.length) { c.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Nenhum lembrete ainda.</div>'; return; }
+  c.innerHTML = entries.map(([id, l]) => {
+    const p = PEOPLE[l.who];
+    return `<div class="lem-row">
+      <div class="lem-icon">${l.icon || '🔔'}</div>
+      <div class="lem-body">
+        <div class="lem-text ${l.done?'done':''}">${l.text}</div>
+        <div class="lem-who" style="${p?`color:${p.color}`:''}">
+          ${p ? p.emoji+' ' : ''}${l.who}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;align-items:center">
+        <button class="icon-btn" onclick="openLemModal('${id}')" title="Editar">✏️</button>
+        <button class="icon-btn" onclick="deleteLem('${id}')" title="Apagar">🗑️</button>
+        <div class="lem-check ${l.done?'done':''}" onclick="toggleLem('${id}')">
+          ${l.done ? '✓' : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.toggleLem = function(id) {
+  const l = liveData.lembretes[id];
+  if (!l) return;
+  update(ref(db, `lembretes/${id}`), { done: !l.done });
+};
+
+window.deleteLem = function(id) {
+  if (!confirm('Apagar este lembrete?')) return;
+  remove(ref(db, `lembretes/${id}`));
+  toast('Lembrete removido');
+};
+
+// ─────────────────────────────────────────────
+//  SHOPPING
+// ─────────────────────────────────────────────
+let pendingBuyId = null;
+
+window.addShopItem = function() {
+  const input = document.getElementById('shop-input');
+  const item  = input.value.trim();
+  if (!item) return;
+  push(ref(db, 'shopping'), { item, bought: false, addedAt: new Date().toISOString() });
+  input.value = '';
+  toast('Item adicionado ✓');
+};
+
+window.openBuyModal = function(id) {
+  pendingBuyId = id;
+  const s = liveData.shopping[id];
+  document.getElementById('shop-modal-item').textContent = s ? `"${s.item}"` : '';
+  document.querySelectorAll('#shop-who-chips .chip').forEach(c => { c.classList.remove('sel'); c.style.background=''; c.style.color=''; });
+  document.getElementById('shop-modal').classList.add('open');
+};
+
+window.confirmBought = function() {
+  const who = getChipVal('shop-who-chips');
+  if (!who) { toast('Escolha quem comprou!'); return; }
+  const s = liveData.shopping[pendingBuyId];
+  if (!s) return;
+
+  // Move to history
+  push(ref(db, 'history'), {
+    item: s.item, who, boughtAt: new Date().toISOString()
+  });
+  remove(ref(db, `shopping/${pendingBuyId}`));
+  toast(`${who} comprou "${s.item}" ✓`);
+  closeModal('shop-modal');
+};
+
+window.deleteShopItem = function(id) {
+  remove(ref(db, `shopping/${id}`));
+  toast('Item removido');
+};
+
+function renderShopping() {
+  const c = document.getElementById('shop-list');
+  const pending = Object.entries(liveData.shopping).filter(([,s]) => !s.bought);
+  if (!pending.length) { c.innerHTML = '<div style="padding:16px;text-align:center;color:var(--muted);font-size:14px">Lista vazia! 🎉</div>'; return; }
+  c.innerHTML = pending.map(([id, s]) => `
+    <div class="shop-row">
+      <div class="shop-check" onclick="openBuyModal('${id}')"></div>
+      <div class="shop-label">${s.item}</div>
+      <button class="icon-btn" onclick="deleteShopItem('${id}')">🗑️</button>
+    </div>`).join('');
+}
+
+function renderHistory() {
+  const c = document.getElementById('shop-hist');
+  const entries = Object.entries(liveData.history).sort(([,a],[,b]) => new Date(b.boughtAt)-new Date(a.boughtAt));
+  if (!entries.length) { c.innerHTML = '<div style="padding:16px;text-align:center;color:var(--muted);font-size:14px">Nenhuma compra registrada ainda.</div>'; return; }
+  c.innerHTML = entries.map(([id, h]) => {
+    const p = PEOPLE[h.who];
+    return `<div class="hist-row">
+      <div style="font-size:18px">✅</div>
+      <div class="hist-label">${h.item}</div>
+      <div class="hist-meta" style="color:${p ? p.color : 'var(--muted)'}">
+        ${p ? p.emoji : ''} ${h.who}<br>${fmtDate(h.boughtAt)}
+      </div>
+      <button class="icon-btn" onclick="deleteHist('${id}')">🗑️</button>
+    </div>`;
+  }).join('');
+}
+
+window.deleteHist = function(id) {
+  remove(ref(db, `history/${id}`));
+};
+
+// ─────────────────────────────────────────────
+//  MACHINE
+// ─────────────────────────────────────────────
+let pendingSlotKey = null;
+
+function renderMachine() {
+  const wk  = getWeekKey();
+  const grid = document.getElementById('machine-grid');
+  grid.innerHTML = WEEK_DAYS.map(day => {
+    const slotsHTML = SLOTS.map(slot => {
+      const key   = `${wk}_${day}_${slot}`.replace(/\s/g,'_');
+      const owner = liveData.machine[key];
+      const p     = owner ? PEOPLE[owner] : null;
+      return `<button class="slot-btn ${owner ? 'taken' : 'free'}"
+        style="${owner ? `background:${p.color}` : ''}"
+        onclick="openSlotModal('${day}','${slot}','${key}')">
+        ${owner ? `${p.emoji} ${owner.split(' ')[0]}` : slot}
+      </button>`;
+    }).join('');
+    return `<div class="day-card">
+      <div class="day-head">${day}</div>
+      <div class="slots-row">${slotsHTML}</div>
+    </div>`;
+  }).join('');
+}
+
+window.openSlotModal = function(day, slot, key) {
+  pendingSlotKey = key;
+  const wk    = getWeekKey();
+  const owner = liveData.machine[key];
+  document.getElementById('slot-modal-title').textContent = `${day} — ${slot}`;
+  document.getElementById('slot-cancel-btn').style.display = owner ? '' : 'none';
+  document.querySelectorAll('#slot-who-chips .chip').forEach(c => { c.classList.remove('sel'); c.style.background=''; c.style.color=''; });
+  if (owner) {
+    const chip = document.querySelector(`#slot-who-chips .chip[data-v="${owner}"]`);
+    if (chip) selChip(chip, 'slot-who-chips');
+  }
+  document.getElementById('slot-modal').classList.add('open');
+};
+
+window.confirmSlot = function() {
+  const who = getChipVal('slot-who-chips');
+  if (!who) { toast('Escolha quem vai usar!'); return; }
+  set(ref(db, `machine/${pendingSlotKey}`), who);
+  toast(`Reservado para ${who} ✓`);
+  closeModal('slot-modal');
+};
+
+window.cancelSlot = function() {
+  remove(ref(db, `machine/${pendingSlotKey}`));
+  toast('Reserva cancelada');
+  closeModal('slot-modal');
+};
+
+// ─────────────────────────────────────────────
+//  REGRAS
+// ─────────────────────────────────────────────
+function renderRegras() {
+  const c = document.getElementById('regras-list');
+  const entries = Object.entries(liveData.regras).sort(([,a],[,b]) => new Date(a.createdAt||0)-new Date(b.createdAt||0));
+  if (!entries.length) { c.innerHTML = ''; return; }
+  c.innerHTML = entries.map(([id, r], i) => `
+    <div class="regra-card ${r.important ? 'important' : ''}">
+      <div class="regra-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="regra-text">${r.important ? '⚠️ ' : ''}${r.text}</div>
+      <button class="regra-del" onclick="deleteRegra('${id}')" title="Remover">✕</button>
+    </div>`).join('');
+}
+
+window.addRegra = function(important) {
+  const input = document.getElementById('regra-input');
+  const text  = input.value.trim();
+  if (!text) return;
+  push(ref(db, 'regras'), { text, important, createdAt: new Date().toISOString() });
+  input.value = '';
+  toast('Regra adicionada ✓');
+};
+
+window.deleteRegra = function(id) {
+  if (!confirm('Remover esta regra?')) return;
+  remove(ref(db, `regras/${id}`));
+  toast('Regra removida');
+};
+
+// ─────────────────────────────────────────────
+//  MODAL CLOSE
+// ─────────────────────────────────────────────
+window.closeModal = function(id) {
+  document.getElementById(id).classList.remove('open');
+};
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ─────────────────────────────────────────────
+//  BOOT
+// ─────────────────────────────────────────────
+(async () => {
+  await seedIfEmpty();
+  startListeners();
+})();
+</script>
+</body>
+</html>
