@@ -17,8 +17,8 @@
   --edu-soft: #DBEAFE;
   --ana:      #18181B;
   --ana-soft: #E4E4E7;
-  --lea:      #3DB89A;
-  --lea-soft: #E0F7F3;
+  --lea:      #8B5CF6;
+  --lea-soft: #EDE9FE;
   --bg:       #F2F1ED;
   --surface:  #FFFFFF;
   --border:   #E5E3DC;
@@ -40,7 +40,7 @@ body {
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
-  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--nav-h) + 100px + env(safe-area-inset-bottom));
 }
 
 /* ── TOPBAR ── */
@@ -390,6 +390,19 @@ body {
 }
 .cal-icons svg { display: block; flex-shrink: 0; }
 
+/* ── CALENDAR LEGEND ── */
+.cal-legend {
+  margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border);
+  font-size: 12px; color: var(--muted);
+}
+.cal-legend-icons { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.cal-legend-icons svg { display: inline-block; vertical-align: middle; }
+.cal-legend-people {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px;
+}
+.cal-legend-person { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+.cal-legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
 /* ── POINTS ── */
 .points-row { display: flex; gap: 10px; padding: 14px 16px; }
 .point-card { flex: 1; text-align: center; border-radius: 14px; padding: 12px 8px; }
@@ -702,7 +715,7 @@ const db  = getDatabase(app);
 const PEOPLE = {
   'Eduarda':   { color: '#3B82F6', soft: '#DBEAFE', emoji: '💙' },
   'Ana Luiza': { color: '#18181B', soft: '#E4E4E7', emoji: '🖤' },
-  'Leander':   { color: '#3DB89A', soft: '#E0F7F3', emoji: '💚' },
+  'Leander':   { color: '#8B5CF6', soft: '#EDE9FE', emoji: '💜' },
 };
 const ALL_PEOPLE = Object.keys(PEOPLE);
 const WEEK_DAYS  = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
@@ -1070,13 +1083,13 @@ function renderCalendar() {
   const now   = new Date();
   const year  = now.getFullYear(), month = now.getMonth();
   const first = new Date(year, month, 1);
-  const startOffset = weekdayIndex(first);
+  const startOffset = first.getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const todayISO = isoDate(now);
 
   let html = `<div class="cal-head"><div class="cal-head-title">${first.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</div></div>`;
   html += '<div class="cal-grid">';
-  ['S','T','Q','Q','S','S','D'].forEach(d => html += `<div class="cal-wd">${d}</div>`);
+  ['D','S','T','Q','Q','S','S'].forEach(d => html += `<div class="cal-wd">${d}</div>`);
   for (let i = 0; i < startOffset; i++) html += '<div class="cal-cell empty"></div>';
 
   for (let day = 1; day <= daysInMonth; day++) {
@@ -1117,6 +1130,12 @@ function renderCalendar() {
     </div>`;
   }
   html += '</div>';
+  html += `<div class="cal-legend">
+    <div class="cal-legend-icons">${svgStar(CAL_GRAY)} tarefa &nbsp; ${svgBubble(CAL_GRAY)} lavanderia</div>
+    <div class="cal-legend-people">
+      ${ALL_PEOPLE.map(p => `<span class="cal-legend-person"><span class="cal-legend-dot" style="background:${PEOPLE[p].color}"></span>${p}</span>`).join('')}
+    </div>
+  </div>`;
   c.innerHTML = html;
 }
 
