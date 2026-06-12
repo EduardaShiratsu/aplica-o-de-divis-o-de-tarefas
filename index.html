@@ -126,7 +126,7 @@ body {
 .task-row:last-child { border-bottom: none; }
 .task-row:active { background: var(--bg); }
 .task-check {
-  width: 26px; height: 26px; border-radius: 50%;
+  width: 28px; height: 28px; border-radius: 50%;
   border: 2px solid var(--border); flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; transition: all .2s;
@@ -136,8 +136,8 @@ body {
 .task-label.done { text-decoration: line-through; color: var(--muted); }
 .task-actions { display: flex; gap: 6px; }
 .icon-btn {
-  width: 30px; height: 30px; border-radius: 8px; border: none;
-  background: var(--bg); cursor: pointer; font-size: 14px;
+  width: 40px; height: 40px; border-radius: 8px; border: none;
+  background: var(--bg); cursor: pointer; font-size: 15px;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
@@ -157,7 +157,7 @@ body {
 }
 .add-input::placeholder { color: var(--muted); }
 .add-btn {
-  padding: 6px 14px; border-radius: 20px; border: none;
+  padding: 10px 16px; min-height: 40px; border-radius: 20px; border: none;
   font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
   cursor: pointer; color: white; background: var(--text); transition: opacity .15s;
 }
@@ -175,9 +175,9 @@ body {
 .lem-text.done { text-decoration: line-through; color: var(--muted); }
 .lem-who  { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .lem-check {
-  width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--border);
+  width: 32px; height: 32px; border-radius: 8px; border: 2px solid var(--border);
   cursor: pointer; display: flex; align-items: center; justify-content: center;
-  font-size: 13px; transition: all .2s; flex-shrink: 0;
+  font-size: 14px; transition: all .2s; flex-shrink: 0;
 }
 .lem-check.done { background: var(--success); border-color: var(--success); color: white; }
 
@@ -188,9 +188,9 @@ body {
 }
 .shop-row:last-child { border-bottom: none; }
 .shop-check {
-  width: 26px; height: 26px; border-radius: 6px; border: 2px solid var(--border);
+  width: 32px; height: 32px; border-radius: 6px; border: 2px solid var(--border);
   flex-shrink: 0; cursor: pointer; display: flex; align-items: center;
-  justify-content: center; font-size: 13px; transition: all .2s;
+  justify-content: center; font-size: 14px; transition: all .2s;
 }
 .shop-check.done { background: var(--success); border-color: var(--success); color: white; }
 .shop-label { flex: 1; font-size: 15px; }
@@ -215,7 +215,7 @@ body {
 .day-head { padding: 12px 16px; font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--border); background: var(--bg); }
 .slots-row { display: flex; gap: 8px; padding: 12px 16px; flex-wrap: wrap; }
 .slot-btn {
-  padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+  padding: 12px 14px; min-height: 44px; border-radius: 20px; border: 1.5px solid var(--border);
   font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
   cursor: pointer; background: none; color: var(--muted); transition: all .2s;
 }
@@ -243,11 +243,12 @@ body {
   transition: border-color .2s;
 }
 .add-regra-input:focus { border-color: var(--text); }
-.add-regra-row { display: flex; gap: 8px; margin-top: 8px; }
+.add-regra-row { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
 .btn-regra {
-  padding: 10px 20px; border-radius: 12px; border: none;
-  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
-  cursor: pointer; transition: opacity .15s;
+  flex: 1 1 0; min-width: 0; min-height: 44px; padding: 10px 8px; border-radius: 12px; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: opacity .15s; text-align: center;
+  display: flex; align-items: center; justify-content: center; white-space: nowrap;
 }
 .btn-regra-ok  { background: var(--text); color: white; }
 .btn-regra-imp { background: #FDE68A; color: #92400E; }
@@ -359,7 +360,7 @@ body {
 .lixo-title { font-size: 14px; font-weight: 600; }
 .lixo-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .lixo-btn {
-  padding: 8px 14px; border-radius: 10px; border: none; font-size: 12px;
+  padding: 8px 14px; min-height: 40px; border-radius: 10px; border: none; font-size: 12px;
   font-weight: 700; cursor: pointer; color: white; flex-shrink: 0;
   font-family: 'DM Sans', sans-serif;
 }
@@ -367,17 +368,27 @@ body {
 /* ── CALENDAR ── */
 .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .cal-head-title { font-size: 15px; font-weight: 700; text-transform: capitalize; }
-.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-.cal-wd { font-size: 10px; font-weight: 700; text-align: center; color: var(--muted); padding-bottom: 4px; }
+.cal-grid {
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 3px; width: 100%;
+}
+.cal-wd {
+  font-size: 10px; font-weight: 700; text-align: center; color: var(--muted);
+  padding-bottom: 4px; line-height: 1;
+}
 .cal-cell {
-  aspect-ratio: 1; border-radius: 10px; background: var(--bg);
-  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-  padding: 4px 2px; position: relative;
+  aspect-ratio: 1; min-width: 0; border-radius: 8px; background: var(--bg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; padding: 2px 0; overflow: hidden;
 }
 .cal-cell.empty { background: none; }
 .cal-cell.today { outline: 2px solid var(--text); outline-offset: -2px; }
-.cal-daynum { font-weight: 700; font-size: 11px; margin-bottom: 2px; }
-.cal-icons { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; align-content: flex-start; }
+.cal-daynum { font-weight: 700; font-size: 11px; line-height: 1; }
+.cal-icons {
+  display: flex; flex-wrap: wrap; gap: 1px; justify-content: center;
+  align-items: center; max-width: 100%; min-height: 11px;
+}
+.cal-icons svg { display: block; flex-shrink: 0; }
 
 /* ── POINTS ── */
 .points-row { display: flex; gap: 10px; padding: 14px 16px; }
@@ -395,7 +406,7 @@ body {
   font-family: 'DM Mono', monospace; font-size: 12px; text-align: center; color: var(--text);
 }
 .ticket-btn {
-  padding: 8px 14px; border-radius: 10px; border: none; font-size: 12px;
+  padding: 8px 14px; min-height: 40px; border-radius: 10px; border: none; font-size: 12px;
   font-weight: 700; cursor: pointer; background: var(--text); color: white;
   font-family: 'DM Sans', sans-serif; flex-shrink: 0;
 }
@@ -409,10 +420,7 @@ body {
 
 /* ── EXPORT BTN ── */
 .export-btn {
-  width: 100%; padding: 13px 0; border-radius: 14px; font-size: 14px;
-  border: 1.5px solid var(--border); cursor: pointer; font-weight: 600;
-  font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text);
-  margin-top: 8px;
+  border: 1.5px solid var(--border); background: var(--surface); color: var(--text);
 }
 </style>
 </head>
@@ -531,8 +539,8 @@ body {
     <div class="add-regra-row">
       <button class="btn-regra btn-regra-ok" type="button" onclick="addRegra(false)">Adicionar</button>
       <button class="btn-regra btn-regra-imp" type="button" onclick="addRegra(true)">⚠️ Importante</button>
+      <button class="btn-regra export-btn" type="button" onclick="exportRegrasPNG()">📷 PNG</button>
     </div>
-    <button class="export-btn" type="button" onclick="exportRegrasPNG()">📷 Exportar como PNG</button>
   </div>
 </div>
 
@@ -735,7 +743,6 @@ function fmtDate(iso) {
 // ── SVG ICONS (calendar) ──
 function svgStar(color)   { return `<svg width="11" height="11" viewBox="0 0 24 24" fill="${color}"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279L12 19.771l-7.416 3.642 1.48-8.279L0 9.306l8.332-1.151z"/></svg>`; }
 function svgBubble(color) { return `<svg width="11" height="11" viewBox="0 0 24 24" fill="${color}"><circle cx="12" cy="12" r="10"/></svg>`; }
-function svgTrash(color)  { return `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0v14a1 1 0 01-1 1H7a1 1 0 01-1-1V6h12z"/></svg>`; }
 const CAL_GRAY = '#D4D2C9';
 
 // Set topbar date
@@ -845,8 +852,49 @@ async function seedIfEmpty() {
   }
 }
 
+// Rename old "Ana Luisa" data to "Ana Luiza" across the whole database
+async function migrateNameFix() {
+  const OLD = 'Ana Luisa', NEW = 'Ana Luiza';
+  const OLD_KEY = safeKey(OLD), NEW_KEY = safeKey(NEW);
+
+  // tasks node: Ana_Luisa -> Ana_Luiza
+  const tasksSnap = await get(ref(db, `tasks/${OLD_KEY}`));
+  if (tasksSnap.exists()) {
+    await set(ref(db, `tasks/${NEW_KEY}`), tasksSnap.val());
+    await remove(ref(db, `tasks/${OLD_KEY}`));
+  }
+
+  // points node: Ana_Luisa -> Ana_Luiza
+  const pointsSnap = await get(ref(db, `points/${OLD_KEY}`));
+  if (pointsSnap.exists()) {
+    await set(ref(db, `points/${NEW_KEY}`), pointsSnap.val());
+    await remove(ref(db, `points/${OLD_KEY}`));
+  }
+
+  // machine reservations: value "Ana Luisa" -> "Ana Luiza"
+  const machineSnap = await get(ref(db, 'machine'));
+  for (const [key, val] of Object.entries(machineSnap.val() || {})) {
+    if (val === OLD) await update(ref(db, 'machine'), { [key]: NEW });
+  }
+
+  // lixo responsavel
+  const lixoSnap0 = await get(ref(db, 'lixo'));
+  for (const [id, l] of Object.entries(lixoSnap0.val() || {})) {
+    if (l && l.responsavel === OLD) await update(ref(db, `lixo/${id}`), { responsavel: NEW });
+  }
+
+  // shopping.who, lembretes.who, history.who
+  for (const node of ['shopping', 'lembretes', 'history']) {
+    const snap = await get(ref(db, node));
+    for (const [id, item] of Object.entries(snap.val() || {})) {
+      if (item && item.who === OLD) await update(ref(db, `${node}/${id}`), { who: NEW });
+    }
+  }
+}
+
 // Seed/migrate new nodes (lixo, points, tickets, task weekdays) even on existing databases
 async function seedExtras() {
+  await migrateNameFix();
   const today = isoDate(new Date());
 
   const lixoSnap = await get(ref(db, 'lixo'));
@@ -1015,13 +1063,6 @@ function renderHomeShop() {
 // ─────────────────────────────────────────────
 //  CALENDAR
 // ─────────────────────────────────────────────
-function daysBetween(fromISO, toISO) {
-  const [ay,am,ad] = fromISO.split('-').map(Number);
-  const [by,bm,bd] = toISO.split('-').map(Number);
-  const a = new Date(ay, am-1, ad);
-  const b = new Date(by, bm-1, bd);
-  return Math.round((b - a) / 86400000);
-}
 
 function renderCalendar() {
   const c = document.getElementById('home-calendar');
@@ -1046,20 +1087,19 @@ function renderCalendar() {
     const isPast  = dISO < todayISO;
     let icons = '';
 
-    // ⭐ tasks
-    ALL_PEOPLE.forEach(person => {
-      const key = safeKey(person);
-      Object.values(liveData.tasks[key] || {}).forEach(t => {
-        if (t.weekday === undefined || t.weekday === null || t.weekday !== wd) return;
-        if (t.postponeUntil && dISO < t.postponeUntil) return;
-        const completed = !!(t.completions && t.completions[dISO]);
-        let color;
-        if (completed) color = PEOPLE[person].color;
-        else if (isPast) color = '#EF4444';
-        else color = CAL_GRAY;
-        icons += svgStar(color);
+    // ⭐ tasks (apenas hoje em diante)
+    if (!isPast) {
+      ALL_PEOPLE.forEach(person => {
+        const key = safeKey(person);
+        Object.values(liveData.tasks[key] || {}).forEach(t => {
+          if (t.weekday === undefined || t.weekday === null || t.weekday !== wd) return;
+          if (t.postponeUntil && dISO < t.postponeUntil) return;
+          const completed = !!(t.completions && t.completions[dISO]);
+          const color = completed ? PEOPLE[person].color : CAL_GRAY;
+          icons += svgStar(color);
+        });
       });
-    });
+    }
 
     // 🫧 máquina
     const wk = getWeekKeyFor(d);
@@ -1070,18 +1110,6 @@ function renderCalendar() {
       if (liveData.machine[mk]) { owner = liveData.machine[mk]; break; }
     }
     if (owner) icons += svgBubble(PEOPLE[owner] ? PEOPLE[owner].color : '#3B82F6');
-
-    // 🗑️ lixo
-    Object.values(liveData.lixo || {}).forEach(l => {
-      if (!l.lastTakenDate || !l.intervalDays) return;
-      const diff = daysBetween(l.lastTakenDate, dISO);
-      if (((diff % l.intervalDays) + l.intervalDays) % l.intervalDays !== 0) return;
-      let color;
-      if (dISO === l.lastTakenDate) color = '#22C55E';
-      else if (isPast) color = '#EF4444';
-      else color = CAL_GRAY;
-      icons += svgTrash(color);
-    });
 
     html += `<div class="cal-cell ${isToday ? 'today' : ''}">
       <div class="cal-daynum">${day}</div>
@@ -1530,9 +1558,9 @@ function renderMachine() {
       const owner = liveData.machine[key];
       const p     = owner ? PEOPLE[owner] : null;
       return `<button class="slot-btn ${owner ? 'taken' : 'free'}"
-        style="${owner ? `background:${p.color}` : ''}"
+        style="${p ? `background:${p.color}` : ''}"
         onclick="openSlotModal('${day}','${slot}','${key}')">
-        ${owner ? `${p.emoji} ${owner.split(' ')[0]}` : slot}
+        ${p ? `${p.emoji} ${owner.split(' ')[0]}` : slot}
       </button>`;
     }).join('');
     return `<div class="day-card">
