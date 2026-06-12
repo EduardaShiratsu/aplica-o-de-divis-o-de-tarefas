@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#F7F6F2">
+<title>Nossa Casa 🏠</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --edu:      #3B82F6;
+  --edu-soft: #DBEAFE;
+  --ana:      #18181B;
+  --ana-soft: #E4E4E7;
+  --lea:      #3DB89A;
+  --lea-soft: #E0F7F3;
+  --bg:       #F2F1ED;
+  --surface:  #FFFFFF;
+  --border:   #E5E3DC;
+  --text:     #18181B;
+  --muted:    #8A8880;
+  --danger:   #EF4444;
+  --success:  #22C55E;
+  --warning:  #F59E0B;
+  --radius:   16px;
+  --nav-h:    64px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom));
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px 12px;
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.topbar-left h1 { font-size: 20px; font-weight: 700; letter-spacing: -.4px; }
+.topbar-left p  { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 1px; }
+.topbar-sync {
+  width: 32px; height: 32px; border-radius: 50%; border: none;
+  background: var(--bg); cursor: pointer; font-size: 16px;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .4s;
+}
+.topbar-sync.spinning { animation: spin .6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── NAV ── */
+.nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  background: var(--surface); border-top: 1px solid var(--border);
+  display: flex; height: var(--nav-h);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.nav-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 3px; border: none; background: none;
+  cursor: pointer; padding: 8px 4px; transition: opacity .15s;
+}
+.nav-btn .n-icon { font-size: 22px; line-height: 1; }
+.nav-btn .n-label { font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: .3px; text-transform: uppercase; }
+.nav-btn.active .n-label { color: var(--text); }
+
+/* ── SCREENS ── */
+.screen { display: none; padding: 20px; animation: fadeIn .2s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+/* ── SECTION LABEL ── */
+.sec-label {
+  font-size: 11px; font-weight: 700; letter-spacing: 1.4px;
+  color: var(--muted); text-transform: uppercase; margin: 24px 0 10px;
+}
+.sec-label:first-child { margin-top: 0; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 10px; overflow: hidden;
+}
+.card-pad { padding: 16px; }
+
+/* ── HOME STATS ── */
+.stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 14px 12px; text-align: center;
+}
+.stat-num { font-size: 28px; font-weight: 700; line-height: 1; }
+.stat-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+
+/* ── PERSON PILL (select) ── */
+.person-bar { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 2px; }
+.person-bar::-webkit-scrollbar { display: none; }
+.p-pill {
+  padding: 8px 18px; border-radius: 20px; border: 2px solid var(--border);
+  background: none; font-family: 'DM Sans', sans-serif; font-size: 14px;
+  font-weight: 600; cursor: pointer; white-space: nowrap; transition: all .15s;
+  flex-shrink: 0;
+}
+.p-pill.active { color: #fff; border-color: transparent; }
+
+/* ── TASK LIST ── */
+.task-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: background .1s;
+}
+.task-row:last-child { border-bottom: none; }
+.task-row:active { background: var(--bg); }
+.task-check {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 2px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; transition: all .2s;
+}
+.task-check.done { border-color: transparent; color: white; }
+.task-label { flex: 1; font-size: 15px; }
+.task-label.done { text-decoration: line-through; color: var(--muted); }
+.task-actions { display: flex; gap: 6px; }
+.icon-btn {
+  width: 30px; height: 30px; border-radius: 8px; border: none;
+  background: var(--bg); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── PROGRESS BAR ── */
+.prog-wrap { height: 3px; background: var(--border); margin: 0 16px 12px; border-radius: 2px; }
+.prog-fill  { height: 100%; border-radius: 2px; transition: width .4s ease; }
+
+/* ── ADD ROW ── */
+.add-row {
+  display: flex; align-items: center; gap: 10px; padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+.add-input {
+  flex: 1; border: none; outline: none; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; background: none; color: var(--text);
+}
+.add-input::placeholder { color: var(--muted); }
+.add-btn {
+  padding: 6px 14px; border-radius: 20px; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; color: white; background: var(--text); transition: opacity .15s;
+}
+.add-btn:disabled { opacity: .4; }
+
+/* ── LEMBRETE ROW ── */
+.lem-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 13px 16px; border-bottom: 1px solid var(--border);
+}
+.lem-row:last-child { border-bottom: none; }
+.lem-icon { font-size: 20px; flex-shrink: 0; padding-top: 1px; }
+.lem-body { flex: 1; }
+.lem-text { font-size: 15px; font-weight: 500; }
+.lem-text.done { text-decoration: line-through; color: var(--muted); }
+.lem-who  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.lem-check {
+  width: 28px; height: 28px; border-radius: 8px; border: 2px solid var(--border);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; transition: all .2s; flex-shrink: 0;
+}
+.lem-check.done { background: var(--success); border-color: var(--success); color: white; }
+
+/* ── SHOPPING ── */
+.shop-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; border-bottom: 1px solid var(--border);
+}
+.shop-row:last-child { border-bottom: none; }
+.shop-check {
+  width: 26px; height: 26px; border-radius: 6px; border: 2px solid var(--border);
+  flex-shrink: 0; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 13px; transition: all .2s;
+}
+.shop-check.done { background: var(--success); border-color: var(--success); color: white; }
+.shop-label { flex: 1; font-size: 15px; }
+.hist-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px; border-bottom: 1px solid var(--border); opacity: .7;
+}
+.hist-row:last-child { border-bottom: none; }
+.hist-label { flex: 1; font-size: 14px; text-decoration: line-through; color: var(--muted); }
+.hist-meta  { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; text-align: right; line-height: 1.4; }
+
+/* ── MACHINE ── */
+.machine-hero {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 18px;
+}
+.machine-emoji { font-size: 48px; line-height: 1; }
+.machine-title { font-size: 18px; font-weight: 700; }
+.machine-sub   { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+.day-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; margin-bottom: 8px; overflow: hidden; }
+.day-head { padding: 12px 16px; font-size: 14px; font-weight: 600; border-bottom: 1px solid var(--border); background: var(--bg); }
+.slots-row { display: flex; gap: 8px; padding: 12px 16px; flex-wrap: wrap; }
+.slot-btn {
+  padding: 7px 14px; border-radius: 20px; border: 1.5px solid var(--border);
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600;
+  cursor: pointer; background: none; color: var(--muted); transition: all .2s;
+}
+.slot-btn.taken { border-color: transparent; color: white; }
+.slot-btn.free  { background: #F0FDF4; border-color: #BBF7D0; color: #16A34A; }
+
+/* ── REGRAS ── */
+.regra-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 15px 16px; margin-bottom: 8px;
+  display: flex; gap: 14px; align-items: flex-start;
+  cursor: pointer; transition: background .15s;
+}
+.regra-card:active { background: var(--bg); }
+.regra-card.important { background: #FFFBEB; border-color: #FDE68A; }
+.regra-num { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); flex-shrink: 0; padding-top: 2px; min-width: 22px; }
+.regra-text { font-size: 14px; line-height: 1.55; flex: 1; }
+.regra-del { background: none; border: none; cursor: pointer; font-size: 16px; opacity: .5; padding: 2px; }
+
+.add-regra-wrap { margin-top: 12px; }
+.add-regra-input {
+  width: 100%; padding: 14px; border: 1.5px dashed var(--border);
+  border-radius: 14px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+  outline: none; background: none; color: var(--text); resize: none;
+  transition: border-color .2s;
+}
+.add-regra-input:focus { border-color: var(--text); }
+.add-regra-row { display: flex; gap: 8px; margin-top: 8px; }
+.btn-regra {
+  padding: 10px 20px; border-radius: 12px; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: opacity .15s;
+}
+.btn-regra-ok  { background: var(--text); color: white; }
+.btn-regra-imp { background: #FDE68A; color: #92400E; }
+
+/* ── HOME LEMBRETE MINI ── */
+.mini-lem {
+  display: flex; align-items: center; gap: 10px; padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.mini-lem:last-child { border-bottom: none; }
+.mini-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.mini-text { font-size: 14px; flex: 1; }
+.mini-who  { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--muted); }
+
+/* ── MODAL ── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200;
+  display: none; align-items: flex-end; justify-content: center;
+}
+.overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border-radius: 24px 24px 0 0; padding: 20px;
+  width: 100%; max-width: 500px; max-height: 88dvh; overflow-y: auto;
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+}
+.modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 18px; }
+.modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+.modal-input {
+  width: 100%; padding: 13px; border: 1.5px solid var(--border);
+  border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px;
+  outline: none; margin-bottom: 12px; color: var(--text);
+}
+.modal-input:focus { border-color: var(--edu); }
+.modal-label { font-size: 12px; font-weight: 700; letter-spacing: .8px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+.chips-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.chip {
+  padding: 8px 16px; border-radius: 20px; border: 2px solid var(--border);
+  background: none; font-family: 'DM Sans', sans-serif; font-size: 14px;
+  font-weight: 600; cursor: pointer; transition: all .15s;
+}
+.chip.sel { color: white; border-color: transparent; }
+.btn-full {
+  width: 100%; padding: 15px; border-radius: 14px; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600;
+  cursor: pointer; background: var(--text); color: white; margin-top: 4px;
+}
+.btn-ghost {
+  width: 100%; padding: 13px; border-radius: 14px; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--muted);
+  background: none; cursor: pointer; margin-top: 6px;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: calc(var(--nav-h) + 16px); left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--text); color: white; padding: 10px 20px; border-radius: 20px;
+  font-size: 14px; font-weight: 500; z-index: 300; opacity: 0;
+  transition: all .3s; pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── LOADING ── */
+.loading {
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px; color: var(--muted); font-size: 14px; gap: 10px;
+}
+.spinner {
+  width: 20px; height: 20px; border: 2px solid var(--border);
+  border-top-color: var(--text); border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+
+/* ── FILTER BAR (compras) ── */
+.filter-bar { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; padding-bottom: 2px; }
+.filter-bar::-webkit-scrollbar { display: none; }
+.f-pill {
+  padding: 7px 14px; border-radius: 18px; border: 2px solid var(--border);
+  background: none; font-family: 'DM Sans', sans-serif; font-size: 13px;
+  font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  transition: all .15s; color: var(--muted);
+}
+.f-pill.active { color: #fff; border-color: transparent; background: var(--text); }
+
+/* ── SHOP TAG ── */
+.shop-tag {
+  font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 10px;
+  flex-shrink: 0; font-family: 'DM Mono', monospace;
+}
+
+/* ── ALERT BANNER (lixo) ── */
+.alert-banner {
+  background: var(--danger); color: white; border-radius: var(--radius);
+  padding: 16px; margin-bottom: 14px; display: flex; align-items: center;
+  gap: 12px; animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .85; } }
+.alert-banner-icon { font-size: 28px; flex-shrink: 0; }
+.alert-banner-text { flex: 1; font-size: 14px; font-weight: 600; line-height: 1.4; }
+.alert-banner-btn {
+  background: white; color: var(--danger); border: none; border-radius: 10px;
+  padding: 8px 14px; font-weight: 700; font-size: 12px; cursor: pointer; flex-shrink: 0;
+}
+
+/* ── LIXO ── */
+.lixo-row { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid var(--border); }
+.lixo-row:last-child { border-bottom: none; }
+.lixo-emoji { font-size: 24px; flex-shrink: 0; }
+.lixo-body { flex: 1; }
+.lixo-title { font-size: 14px; font-weight: 600; }
+.lixo-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.lixo-btn {
+  padding: 8px 14px; border-radius: 10px; border: none; font-size: 12px;
+  font-weight: 700; cursor: pointer; color: white; flex-shrink: 0;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── CALENDAR ── */
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.cal-head-title { font-size: 15px; font-weight: 700; text-transform: capitalize; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-wd { font-size: 10px; font-weight: 700; text-align: center; color: var(--muted); padding-bottom: 4px; }
+.cal-cell {
+  aspect-ratio: 1; border-radius: 10px; background: var(--bg);
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+  padding: 4px 2px; position: relative;
+}
+.cal-cell.empty { background: none; }
+.cal-cell.today { outline: 2px solid var(--text); outline-offset: -2px; }
+.cal-daynum { font-weight: 700; font-size: 11px; margin-bottom: 2px; }
+.cal-icons { display: flex; flex-wrap: wrap; gap: 2px; justify-content: center; align-content: flex-start; }
+
+/* ── POINTS ── */
+.points-row { display: flex; gap: 10px; padding: 14px 16px; }
+.point-card { flex: 1; text-align: center; border-radius: 14px; padding: 12px 8px; }
+.point-num { font-size: 22px; font-weight: 700; }
+.point-lbl { font-size: 11px; margin-top: 2px; font-weight: 600; }
+
+/* ── TICKETS ── */
+.ticket-row { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-bottom: 1px solid var(--border); }
+.ticket-row:last-child { border-bottom: none; }
+.ticket-title { font-size: 14px; font-weight: 600; flex: 1; }
+.ticket-cost { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.ticket-cost input {
+  width: 42px; border: 1px solid var(--border); border-radius: 6px; padding: 4px;
+  font-family: 'DM Mono', monospace; font-size: 12px; text-align: center; color: var(--text);
+}
+.ticket-btn {
+  padding: 8px 14px; border-radius: 10px; border: none; font-size: 12px;
+  font-weight: 700; cursor: pointer; background: var(--text); color: white;
+  font-family: 'DM Sans', sans-serif; flex-shrink: 0;
+}
+
+/* ── WEEKDAY SELECT (tasks) ── */
+.wd-select {
+  font-family: 'DM Sans', sans-serif; font-size: 11px; border: 1px solid var(--border);
+  border-radius: 8px; padding: 4px 4px; background: var(--surface); color: var(--muted);
+  flex-shrink: 0; max-width: 64px;
+}
+
+/* ── EXPORT BTN ── */
+.export-btn {
+  width: 100%; padding: 13px 0; border-radius: 14px; font-size: 14px;
+  border: 1.5px solid var(--border); cursor: pointer; font-weight: 600;
+  font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text);
+  margin-top: 8px;
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <h1>🏠 Nossa Casa</h1>
+    <p id="top-date"></p>
+  </div>
+  <button class="topbar-sync" id="sync-btn" onclick="syncAll()" title="Sincronizar">🔄</button>
+</div>
+
+<!-- ═══════════════════════════════ SCREENS ═══════════════════════════════ -->
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div id="lixo-alert-banner"></div>
+
+  <div class="sec-label">Calendário</div>
+  <div class="card card-pad" id="home-calendar">
+    <div class="loading"><div class="spinner"></div> Carregando...</div>
+  </div>
+
+  <div class="sec-label">Pontos</div>
+  <div class="card"><div class="points-row" id="home-points"></div></div>
+
+  <div class="sec-label">Tickets</div>
+  <div class="card" id="home-tickets"></div>
+
+  <div class="sec-label">Tarefas por pessoa</div>
+  <div id="home-people-summary"></div>
+
+  <div class="sec-label">Lixo</div>
+  <div class="card" id="home-lixo"></div>
+
+  <div class="sec-label">Avisos ativos</div>
+  <div class="card" id="home-lembretes-list">
+    <div class="loading"><div class="spinner"></div> Carregando...</div>
+  </div>
+
+  <div class="sec-label">Lista de compras — pendentes</div>
+  <div class="card" id="home-shop-list">
+    <div class="loading"><div class="spinner"></div> Carregando...</div>
+  </div>
+</div>
+
+<!-- TAREFAS -->
+<div class="screen" id="screen-tarefas">
+  <div class="person-bar" id="task-person-bar">
+    <button class="p-pill" data-p="Eduarda"   onclick="selectTaskPerson('Eduarda',   this)">Eduarda</button>
+    <button class="p-pill" data-p="Ana Luiza" onclick="selectTaskPerson('Ana Luiza', this)">Ana Luiza</button>
+    <button class="p-pill" data-p="Leander"   onclick="selectTaskPerson('Leander',   this)">Leander</button>
+  </div>
+  <div id="task-content">
+    <div style="text-align:center;color:var(--muted);padding:40px 0;font-size:15px;">
+      Escolha uma pessoa acima ☝️
+    </div>
+  </div>
+</div>
+
+<!-- AVISOS -->
+<div class="screen" id="screen-lembretes">
+  <div class="sec-label">Avisos & tarefas rotativas</div>
+  <div class="card" id="lem-list"></div>
+  <button class="add-btn" style="margin-top:12px;padding:13px 0;width:100%;border-radius:14px;font-size:15px;background:var(--text)" onclick="openLemModal()">+ Novo aviso</button>
+</div>
+
+<!-- COMPRAS -->
+<div class="screen" id="screen-compras">
+  <div class="sec-label">Lista de compras</div>
+  <div class="filter-bar" id="shop-filter-bar">
+    <button class="f-pill active" data-f="Todos"     onclick="setShopFilter('Todos',this)">Todos</button>
+    <button class="f-pill" data-f="Geral"     onclick="setShopFilter('Geral',this)">Geral</button>
+    <button class="f-pill" data-f="Eduarda"   onclick="setShopFilter('Eduarda',this)">Eduarda</button>
+    <button class="f-pill" data-f="Ana Luiza" onclick="setShopFilter('Ana Luiza',this)">Ana Luiza</button>
+    <button class="f-pill" data-f="Leander"   onclick="setShopFilter('Leander',this)">Leander</button>
+  </div>
+  <div class="card" id="shop-list"></div>
+  <div class="card" style="margin-top:0" id="shop-add-wrap">
+    <div class="add-row">
+      <input class="add-input" id="shop-input" placeholder="Adicionar item..." onkeydown="if(event.key==='Enter')addShopItem()">
+    </div>
+    <div class="chips-row" style="padding:0 16px 12px;margin-bottom:0" id="shop-add-who-chips">
+      <button class="chip sel" data-v="Geral" style="background:var(--text);color:#fff" onclick="selPlainChip(this,'shop-add-who-chips')">Geral</button>
+      <button class="chip" data-v="Eduarda"   onclick="selPlainChip(this,'shop-add-who-chips')">Eduarda</button>
+      <button class="chip" data-v="Ana Luiza" onclick="selPlainChip(this,'shop-add-who-chips')">Ana Luiza</button>
+      <button class="chip" data-v="Leander"   onclick="selPlainChip(this,'shop-add-who-chips')">Leander</button>
+      <button class="add-btn" style="margin-left:auto" onclick="addShopItem()">Adicionar</button>
+    </div>
+  </div>
+
+  <div class="sec-label" style="margin-top:24px">Histórico de compras</div>
+  <div class="card" id="shop-hist"></div>
+</div>
+
+<!-- MÁQUINA -->
+<div class="screen" id="screen-maquina">
+  <div class="machine-hero">
+    <div class="machine-emoji">🫧</div>
+    <div>
+      <div class="machine-title">Máquina de Lavar</div>
+      <div class="machine-sub">Reserve seu horário — reseta toda semana</div>
+    </div>
+  </div>
+  <div id="machine-grid"></div>
+</div>
+
+<!-- REGRAS -->
+<div class="screen" id="screen-regras">
+  <div class="sec-label">Regras da casa</div>
+  <div id="regras-list"></div>
+  <div class="add-regra-wrap">
+    <textarea class="add-regra-input" id="regra-input" rows="2" placeholder="Escrever nova regra..."></textarea>
+    <div class="add-regra-row">
+      <button class="btn-regra btn-regra-ok" type="button" onclick="addRegra(false)">Adicionar</button>
+      <button class="btn-regra btn-regra-imp" type="button" onclick="addRegra(true)">⚠️ Importante</button>
+    </div>
+    <button class="export-btn" type="button" onclick="exportRegrasPNG()">📷 Exportar como PNG</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ NAV ═══════════════════════════════ -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="goScreen('home',this)">
+    <span class="n-icon">🏠</span><span class="n-label">Home</span>
+  </button>
+  <button class="nav-btn" onclick="goScreen('tarefas',this)">
+    <span class="n-icon">✅</span><span class="n-label">Tarefas</span>
+  </button>
+  <button class="nav-btn" onclick="goScreen('lembretes',this)">
+    <span class="n-icon">🔔</span><span class="n-label">Avisos</span>
+  </button>
+  <button class="nav-btn" onclick="goScreen('compras',this)">
+    <span class="n-icon">🛒</span><span class="n-label">Compras</span>
+  </button>
+  <button class="nav-btn" onclick="goScreen('maquina',this)">
+    <span class="n-icon">🫧</span><span class="n-label">Máquina</span>
+  </button>
+  <button class="nav-btn" onclick="goScreen('regras',this)">
+    <span class="n-icon">📋</span><span class="n-label">Regras</span>
+  </button>
+</nav>
+
+<!-- ═══════════════════════════════ MODALS ═══════════════════════════════ -->
+
+<!-- Aviso Modal -->
+<div class="overlay" id="lem-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="lem-modal-title">Novo aviso</div>
+    <input class="modal-input" id="lem-text-input" placeholder="Ex: Tirar o lixo, comprar sabão...">
+    <div class="modal-label">Responsável</div>
+    <div class="chips-row" id="lem-who-chips">
+      <button class="chip" data-v="Eduarda"   onclick="selChip(this,'lem-who-chips')">Eduarda</button>
+      <button class="chip" data-v="Ana Luiza" onclick="selChip(this,'lem-who-chips')">Ana Luiza</button>
+      <button class="chip" data-v="Leander"   onclick="selChip(this,'lem-who-chips')">Leander</button>
+      <button class="chip" data-v="Todos"     onclick="selChip(this,'lem-who-chips')">Todos</button>
+    </div>
+    <div class="modal-label">Expira em (opcional)</div>
+    <div class="chips-row" id="lem-exp-chips">
+      <button class="chip sel" data-v="0"  style="background:var(--text);color:#fff" onclick="selPlainChip(this,'lem-exp-chips')">Nunca</button>
+      <button class="chip" data-v="1"  onclick="selPlainChip(this,'lem-exp-chips')">1 dia</button>
+      <button class="chip" data-v="2"  onclick="selPlainChip(this,'lem-exp-chips')">2 dias</button>
+      <button class="chip" data-v="3"  onclick="selPlainChip(this,'lem-exp-chips')">3 dias</button>
+      <button class="chip" data-v="5"  onclick="selPlainChip(this,'lem-exp-chips')">5 dias</button>
+      <button class="chip" data-v="7"  onclick="selPlainChip(this,'lem-exp-chips')">7 dias</button>
+      <button class="chip" data-v="14" onclick="selPlainChip(this,'lem-exp-chips')">14 dias</button>
+      <button class="chip" data-v="30" onclick="selPlainChip(this,'lem-exp-chips')">30 dias</button>
+    </div>
+    <button class="btn-full" onclick="saveLembrete()">Salvar</button>
+    <button class="btn-ghost" onclick="closeModal('lem-modal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- Slot Modal -->
+<div class="overlay" id="slot-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="slot-modal-title">Reservar horário</div>
+    <div class="modal-label">Quem vai usar?</div>
+    <div class="chips-row" id="slot-who-chips">
+      <button class="chip" data-v="Eduarda"   onclick="selChip(this,'slot-who-chips')">Eduarda</button>
+      <button class="chip" data-v="Ana Luiza" onclick="selChip(this,'slot-who-chips')">Ana Luiza</button>
+      <button class="chip" data-v="Leander"   onclick="selChip(this,'slot-who-chips')">Leander</button>
+    </div>
+    <button class="btn-full" onclick="confirmSlot()">Reservar</button>
+    <button class="btn-ghost" id="slot-cancel-btn" onclick="cancelSlot()" style="color:var(--danger)">Cancelar reserva</button>
+    <button class="btn-ghost" onclick="closeModal('slot-modal')">Fechar</button>
+  </div>
+</div>
+
+<!-- Compra — quem comprou -->
+<div class="overlay" id="shop-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Quem comprou? <span id="shop-modal-item" style="color:var(--muted);font-weight:400"></span></div>
+    <div class="chips-row" id="shop-who-chips">
+      <button class="chip" data-v="Eduarda"   onclick="selChip(this,'shop-who-chips')">Eduarda</button>
+      <button class="chip" data-v="Ana Luiza" onclick="selChip(this,'shop-who-chips')">Ana Luiza</button>
+      <button class="chip" data-v="Leander"   onclick="selChip(this,'shop-who-chips')">Leander</button>
+    </div>
+    <button class="btn-full" onclick="confirmBought()">Confirmar compra</button>
+    <button class="btn-ghost" onclick="closeModal('shop-modal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- Ticket: Adiar tarefa -->
+<div class="overlay" id="ticket-adiar-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🎫 Adiar tarefa 3 dias</div>
+    <div class="modal-label">Pessoa</div>
+    <div class="chips-row" id="adiar-person-chips">
+      <button class="chip" data-v="Eduarda"   onclick="selChip(this,'adiar-person-chips');fillTaskSelect('adiar-person-chips','adiar-task-select')">Eduarda</button>
+      <button class="chip" data-v="Ana Luiza" onclick="selChip(this,'adiar-person-chips');fillTaskSelect('adiar-person-chips','adiar-task-select')">Ana Luiza</button>
+      <button class="chip" data-v="Leander"   onclick="selChip(this,'adiar-person-chips');fillTaskSelect('adiar-person-chips','adiar-task-select')">Leander</button>
+    </div>
+    <div class="modal-label">Tarefa</div>
+    <select class="modal-input" id="adiar-task-select"><option value="">Escolha a pessoa primeiro</option></select>
+    <button class="btn-full" onclick="redeemAdiar()">Resgatar</button>
+    <button class="btn-ghost" onclick="closeModal('ticket-adiar-modal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- Ticket: Trocar dia fixo -->
+<div class="overlay" id="ticket-trocar-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🎫 Trocar dia fixo da tarefa</div>
+    <div class="modal-label">Pessoa</div>
+    <div class="chips-row" id="trocar-person-chips">
+      <button class="chip" data-v="Eduarda"   onclick="selChip(this,'trocar-person-chips');fillTaskSelect('trocar-person-chips','trocar-task-select')">Eduarda</button>
+      <button class="chip" data-v="Ana Luiza" onclick="selChip(this,'trocar-person-chips');fillTaskSelect('trocar-person-chips','trocar-task-select')">Ana Luiza</button>
+      <button class="chip" data-v="Leander"   onclick="selChip(this,'trocar-person-chips');fillTaskSelect('trocar-person-chips','trocar-task-select')">Leander</button>
+    </div>
+    <div class="modal-label">Tarefa</div>
+    <select class="modal-input" id="trocar-task-select"><option value="">Escolha a pessoa primeiro</option></select>
+    <div class="modal-label">Novo dia fixo</div>
+    <select class="modal-input" id="trocar-day-select">
+      <option value="0">Segunda</option>
+      <option value="1">Terça</option>
+      <option value="2">Quarta</option>
+      <option value="3">Quinta</option>
+      <option value="4">Sexta</option>
+      <option value="5">Sábado</option>
+      <option value="6">Domingo</option>
+    </select>
+    <button class="btn-full" onclick="redeemTrocar()">Resgatar</button>
+    <button class="btn-ghost" onclick="closeModal('ticket-trocar-modal')">Cancelar</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════ FIREBASE + JS ═══════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script type="module">
+import { initializeApp }                      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+import { getDatabase, ref, onValue, set, push, update, remove, get }
+                                               from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+// ── CONFIG ──
+const firebaseConfig = {
+  apiKey:            "AIzaSyCJlJ_P9AnOCe11qCE52MM0sb1xiIxG8tw",
+  authDomain:        "casa-89d01.firebaseapp.com",
+  databaseURL:       "https://casa-89d01-default-rtdb.firebaseio.com",
+  projectId:         "casa-89d01",
+  storageBucket:     "casa-89d01.firebasestorage.app",
+  messagingSenderId: "69415546392",
+  appId:             "1:69415546392:web:9b6437d428c61d5e88dd6d"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+// ── PEOPLE ──
+const PEOPLE = {
+  'Eduarda':   { color: '#3B82F6', soft: '#DBEAFE', emoji: '💙' },
+  'Ana Luiza': { color: '#18181B', soft: '#E4E4E7', emoji: '🖤' },
+  'Leander':   { color: '#3DB89A', soft: '#E0F7F3', emoji: '💚' },
+};
+const ALL_PEOPLE = Object.keys(PEOPLE);
+const WEEK_DAYS  = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
+const SLOTS      = ['Manhã','Tarde','Noite'];
+
+// Default fixed weekday (index into WEEK_DAYS) per person's tasks
+const DEFAULT_WEEKDAY = { 'Eduarda': 1, 'Ana Luiza': 6, 'Leander': 4 }; // Terça, Domingo, Sexta
+
+// ── STATE (live) ──
+let liveData = { tasks: {}, lembretes: {}, shopping: {}, history: {}, machine: {}, regras: {}, lixo: {}, points: {}, tickets: {} };
+
+// ── DATE HELPERS ──
+function todayStr() {
+  return new Date().toLocaleDateString('pt-BR');
+}
+function isoDate(d) {
+  const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function weekdayIndex(d) {
+  return (d.getDay() + 6) % 7; // 0 = Segunda ... 6 = Domingo
+}
+function getWeekKey() {
+  const d   = new Date();
+  const jan = new Date(d.getFullYear(), 0, 1);
+  const w   = Math.ceil(((d - jan) / 86400000 + jan.getDay() + 1) / 7);
+  return `${d.getFullYear()}-W${w}`;
+}
+function getWeekKeyFor(d) {
+  const jan = new Date(d.getFullYear(), 0, 1);
+  const w   = Math.ceil(((d - jan) / 86400000 + jan.getDay() + 1) / 7);
+  return `${d.getFullYear()}-W${w}`;
+}
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+}
+
+// ── SVG ICONS (calendar) ──
+function svgStar(color)   { return `<svg width="11" height="11" viewBox="0 0 24 24" fill="${color}"><path d="M12 .587l3.668 7.568 8.332 1.151-6.064 5.828 1.48 8.279L12 19.771l-7.416 3.642 1.48-8.279L0 9.306l8.332-1.151z"/></svg>`; }
+function svgBubble(color) { return `<svg width="11" height="11" viewBox="0 0 24 24" fill="${color}"><circle cx="12" cy="12" r="10"/></svg>`; }
+function svgTrash(color)  { return `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0v14a1 1 0 01-1 1H7a1 1 0 01-1-1V6h12z"/></svg>`; }
+const CAL_GRAY = '#D4D2C9';
+
+// Set topbar date
+document.getElementById('top-date').textContent =
+  new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+
+// ── SCREEN NAV ──
+window.goScreen = function(name, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  btn.classList.add('active');
+};
+
+// ── TOAST ──
+window.toast = function(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+};
+
+// ── SYNC BUTTON ──
+window.syncAll = function() {
+  const btn = document.getElementById('sync-btn');
+  btn.classList.add('spinning');
+  setTimeout(() => btn.classList.remove('spinning'), 600);
+  toast('Sincronizado! ✓');
+};
+
+// ── CHIP SELECTOR ──
+window.selChip = function(el, groupId) {
+  document.querySelectorAll(`#${groupId} .chip`).forEach(c => {
+    c.classList.remove('sel');
+    c.style.background = '';
+    c.style.color = '';
+  });
+  el.classList.add('sel');
+  const p = PEOPLE[el.dataset.v];
+  el.style.background = p ? p.color : '#6B7280';
+  el.style.color = 'white';
+};
+function getChipVal(groupId) {
+  const sel = document.querySelector(`#${groupId} .chip.sel`);
+  return sel ? sel.dataset.v : null;
+}
+
+// ── PLAIN CHIP SELECTOR (non-person chips: Geral, expiration, etc.) ──
+window.selPlainChip = function(el, groupId) {
+  document.querySelectorAll(`#${groupId} .chip`).forEach(c => {
+    c.classList.remove('sel');
+    c.style.background = '';
+    c.style.color = '';
+  });
+  el.classList.add('sel');
+  el.style.background = 'var(--text)';
+  el.style.color = 'white';
+};
+
+// ─────────────────────────────────────────────
+//  FIREBASE INIT — seed defaults if empty
+// ─────────────────────────────────────────────
+async function seedIfEmpty() {
+  const snap = await get(ref(db, 'tasks'));
+  if (snap.exists()) return;
+
+  const defaultTasks = {
+    'Eduarda': [
+      { text: 'Limpar banheiro',         done: false, icon: '🚿' },
+      { text: 'Esfregar o vaso',         done: false, icon: '🧴' },
+      { text: 'Lavar espelho e pia',     done: false, icon: '🪥' },
+      { text: 'Trocar toalhas',          done: false, icon: '🧺' },
+    ],
+    'Ana Luiza': [
+      { text: 'Limpar bancada',          done: false, icon: '🍽️' },
+      { text: 'Limpar fogão e forno',    done: false, icon: '🔥' },
+      { text: 'Organizar geladeira',     done: false, icon: '🧊' },
+      { text: 'Varrer chão da cozinha',  done: false, icon: '🧹' },
+    ],
+    'Leander': [
+      { text: 'Limpar sala de estar',    done: false, icon: '🛋️' },
+      { text: 'Limpar corredor',         done: false, icon: '🚪' },
+      { text: 'Aspirar tapetes',         done: false, icon: '💨' },
+      { text: 'Organizar objetos da sala', done: false, icon: '📦' },
+    ]
+  };
+
+  for (const [person, tasks] of Object.entries(defaultTasks)) {
+    for (const task of tasks) {
+      await push(ref(db, `tasks/${safeKey(person)}`), { ...task, weekday: DEFAULT_WEEKDAY[person], createdAt: new Date().toISOString() });
+    }
+  }
+
+  const defaultRegras = [
+    { text: 'Cada uma lava, seca e guarda sua própria louça no mesmo dia.', important: true },
+    { text: 'Cada uma cuida da limpeza da sua área pelo menos uma vez por semana.' },
+    { text: 'Reservas da máquina devem ser feitas no app. Quem não reservou respeita quem reservou.', important: true },
+    { text: 'Produtos coletivos são divididos igualmente. Avise quando estiver acabando!' },
+    { text: 'Lixo deve ser tirado quando o saco encher.' },
+    { text: 'Convidados são bem-vindos, mas avise com antecedência.' },
+    { text: 'Barulho reduzido após as 22h. Fones sempre bem-vindos! 🎧' },
+    { text: 'Mantimentos pessoais identificados não devem ser usados sem permissão.', important: true },
+    { text: 'Problemas na casa (vazamento, etc.) devem ser reportados no grupo imediatamente.' },
+    { text: 'Respeito é a regra nº1. Em caso de conflito, conversa direta primeiro. 💬', important: true },
+  ];
+  for (const r of defaultRegras) {
+    await push(ref(db, 'regras'), { ...r, createdAt: new Date().toISOString() });
+  }
+}
+
+// Seed/migrate new nodes (lixo, points, tickets, task weekdays) even on existing databases
+async function seedExtras() {
+  const today = isoDate(new Date());
+
+  const lixoSnap = await get(ref(db, 'lixo'));
+  if (!lixoSnap.exists()) {
+    await set(ref(db, 'lixo'), {
+      banheiro: { label: 'Lixo do banheiro', emoji: '🚽',  responsavel: 'Eduarda',   intervalDays: 5, lastTakenDate: today, full: false },
+      cozinha:  { label: 'Lixo da cozinha',  emoji: '🍽️', responsavel: 'Ana Luiza', intervalDays: 3, lastTakenDate: today, full: false },
+      grande:   { label: 'Lixo grande',      emoji: '🛋️', responsavel: 'Leander',   intervalDays: 7, lastTakenDate: today, full: false },
+    });
+  }
+
+  const pointsSnap = await get(ref(db, 'points'));
+  if (!pointsSnap.exists()) {
+    await set(ref(db, 'points'), { Eduarda: 0, Ana_Luiza: 0, Leander: 0 });
+  }
+
+  const ticketsSnap = await get(ref(db, 'tickets'));
+  if (!ticketsSnap.exists()) {
+    await set(ref(db, 'tickets'), {
+      adiar:  { label: 'Adiar tarefa 3 dias', cost: 5 },
+      trocar: { label: 'Trocar dia fixo desta tarefa', cost: 5 },
+    });
+  }
+
+  // Migrate existing tasks without a fixed weekday
+  const tasksSnap = await get(ref(db, 'tasks'));
+  const tasks = tasksSnap.val() || {};
+  for (const [personKey, personTasks] of Object.entries(tasks)) {
+    const person = fromKey(personKey);
+    for (const [id, t] of Object.entries(personTasks || {})) {
+      if (t.weekday === undefined || t.weekday === null) {
+        await update(ref(db, `tasks/${personKey}/${id}`), { weekday: DEFAULT_WEEKDAY[person] ?? 0 });
+      }
+    }
+  }
+}
+
+function safeKey(str) { return str.replace(/\s/g, '_'); }
+function fromKey(str) { return str.replace(/_/g, ' '); }
+
+// ─────────────────────────────────────────────
+//  LISTENERS
+// ─────────────────────────────────────────────
+function startListeners() {
+  // TASKS
+  onValue(ref(db, 'tasks'), snap => {
+    liveData.tasks = snap.val() || {};
+    renderTaskContent();
+    renderHomePeople();
+    renderCalendar();
+  });
+
+  // LEMBRETES (Avisos)
+  onValue(ref(db, 'lembretes'), snap => {
+    liveData.lembretes = snap.val() || {};
+    renderLembretes();
+    renderHomeLembretes();
+    cleanupExpiredAvisos();
+  });
+
+  // SHOPPING
+  onValue(ref(db, 'shopping'), snap => {
+    liveData.shopping = snap.val() || {};
+    renderShopping();
+    renderHomeShop();
+  });
+
+  // HISTORY
+  onValue(ref(db, 'history'), snap => {
+    liveData.history = snap.val() || {};
+    renderHistory();
+  });
+
+  // MACHINE
+  onValue(ref(db, 'machine'), snap => {
+    liveData.machine = snap.val() || {};
+    renderMachine();
+    renderCalendar();
+  });
+
+  // REGRAS
+  onValue(ref(db, 'regras'), snap => {
+    liveData.regras = snap.val() || {};
+    renderRegras();
+  });
+
+  // LIXO
+  onValue(ref(db, 'lixo'), snap => {
+    liveData.lixo = snap.val() || {};
+    renderLixo();
+    renderLixoAlert();
+    renderCalendar();
+  });
+
+  // POINTS
+  onValue(ref(db, 'points'), snap => {
+    liveData.points = snap.val() || {};
+    renderPoints();
+  });
+
+  // TICKETS
+  onValue(ref(db, 'tickets'), snap => {
+    liveData.tickets = snap.val() || {};
+    renderTickets();
+  });
+}
+
+// ─────────────────────────────────────────────
+//  HOME
+// ─────────────────────────────────────────────
+function renderHomePeople() {
+  const c = document.getElementById('home-people-summary');
+  c.innerHTML = '';
+  ALL_PEOPLE.forEach(person => {
+    const p     = PEOPLE[person];
+    const key   = safeKey(person);
+    const tasks = Object.values(liveData.tasks[key] || {});
+    if (!tasks.length) return;
+    const done = tasks.filter(t => t.done).length;
+    const pct  = Math.round(done / tasks.length * 100);
+    const card = document.createElement('div');
+    card.className = 'card'; card.style.marginBottom = '10px';
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 16px">
+        <div style="width:40px;height:40px;border-radius:50%;background:${p.soft};color:${p.color};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">${p.emoji}</div>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:600">${person}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${done} de ${tasks.length} tarefas feitas</div>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500;color:${p.color}">${pct}%</div>
+      </div>
+      <div style="height:3px;background:var(--border);margin:0 16px 14px;border-radius:2px">
+        <div style="height:100%;width:${pct}%;background:${p.color};border-radius:2px;transition:width .4s"></div>
+      </div>`;
+    c.appendChild(card);
+  });
+}
+
+function renderHomeLembretes() {
+  const c = document.getElementById('home-lembretes-list');
+  const active = Object.entries(liveData.lembretes).filter(([,l]) => !l.done);
+  if (!active.length) { c.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:14px;text-align:center">Nenhum aviso pendente ✓</div>'; return; }
+  c.innerHTML = active.slice(0, 5).map(([, l]) => {
+    const p = PEOPLE[l.who];
+    return `<div class="mini-lem">
+      <div class="mini-dot" style="background:${p ? p.color : '#6B7280'}"></div>
+      <div class="mini-text">${l.text}</div>
+      <div class="mini-who">${l.who}</div>
+    </div>`;
+  }).join('');
+  if (active.length > 5) c.innerHTML += `<div style="padding:10px 14px;font-size:12px;color:var(--muted)">+${active.length-5} mais...</div>`;
+}
+
+function renderHomeShop() {
+  const c = document.getElementById('home-shop-list');
+  const pending = Object.entries(liveData.shopping).filter(([,s]) => !s.bought);
+  if (!pending.length) { c.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:14px;text-align:center">Lista vazia ✓</div>'; return; }
+  c.innerHTML = pending.slice(0, 5).map(([, s]) => `
+    <div class="mini-lem">
+      <div class="mini-dot" style="background:var(--success)"></div>
+      <div class="mini-text">${s.item}</div>
+    </div>`).join('');
+  if (pending.length > 5) c.innerHTML += `<div style="padding:10px 14px;font-size:12px;color:var(--muted)">+${pending.length-5} mais...</div>`;
+}
+
+// ─────────────────────────────────────────────
+//  CALENDAR
+// ─────────────────────────────────────────────
+function daysBetween(fromISO, toISO) {
+  const [ay,am,ad] = fromISO.split('-').map(Number);
+  const [by,bm,bd] = toISO.split('-').map(Number);
+  const a = new Date(ay, am-1, ad);
+  const b = new Date(by, bm-1, bd);
+  return Math.round((b - a) / 86400000);
+}
+
+function renderCalendar() {
+  const c = document.getElementById('home-calendar');
+  if (!c) return;
+  const now   = new Date();
+  const year  = now.getFullYear(), month = now.getMonth();
+  const first = new Date(year, month, 1);
+  const startOffset = weekdayIndex(first);
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const todayISO = isoDate(now);
+
+  let html = `<div class="cal-head"><div class="cal-head-title">${first.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</div></div>`;
+  html += '<div class="cal-grid">';
+  ['S','T','Q','Q','S','S','D'].forEach(d => html += `<div class="cal-wd">${d}</div>`);
+  for (let i = 0; i < startOffset; i++) html += '<div class="cal-cell empty"></div>';
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d    = new Date(year, month, day);
+    const dISO = isoDate(d);
+    const wd   = weekdayIndex(d);
+    const isToday = dISO === todayISO;
+    const isPast  = dISO < todayISO;
+    let icons = '';
+
+    // ⭐ tasks
+    ALL_PEOPLE.forEach(person => {
+      const key = safeKey(person);
+      Object.values(liveData.tasks[key] || {}).forEach(t => {
+        if (t.weekday === undefined || t.weekday === null || t.weekday !== wd) return;
+        if (t.postponeUntil && dISO < t.postponeUntil) return;
+        const completed = !!(t.completions && t.completions[dISO]);
+        let color;
+        if (completed) color = PEOPLE[person].color;
+        else if (isPast) color = '#EF4444';
+        else color = CAL_GRAY;
+        icons += svgStar(color);
+      });
+    });
+
+    // 🫧 máquina
+    const wk = getWeekKeyFor(d);
+    const dayName = WEEK_DAYS[wd];
+    let owner = null;
+    for (const slot of SLOTS) {
+      const mk = `${wk}_${dayName}_${slot}`.replace(/\s/g, '_');
+      if (liveData.machine[mk]) { owner = liveData.machine[mk]; break; }
+    }
+    if (owner) icons += svgBubble(PEOPLE[owner] ? PEOPLE[owner].color : '#3B82F6');
+
+    // 🗑️ lixo
+    Object.values(liveData.lixo || {}).forEach(l => {
+      if (!l.lastTakenDate || !l.intervalDays) return;
+      const diff = daysBetween(l.lastTakenDate, dISO);
+      if (((diff % l.intervalDays) + l.intervalDays) % l.intervalDays !== 0) return;
+      let color;
+      if (dISO === l.lastTakenDate) color = '#22C55E';
+      else if (isPast) color = '#EF4444';
+      else color = CAL_GRAY;
+      icons += svgTrash(color);
+    });
+
+    html += `<div class="cal-cell ${isToday ? 'today' : ''}">
+      <div class="cal-daynum">${day}</div>
+      <div class="cal-icons">${icons}</div>
+    </div>`;
+  }
+  html += '</div>';
+  c.innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+//  POINTS & TICKETS
+// ─────────────────────────────────────────────
+function renderPoints() {
+  const c = document.getElementById('home-points');
+  if (!c) return;
+  c.innerHTML = ALL_PEOPLE.map(person => {
+    const info = PEOPLE[person];
+    const pts  = liveData.points[safeKey(person)] ?? 0;
+    return `<div class="point-card" style="background:${info.soft}">
+      <div class="point-num" style="color:${info.color}">${pts}</div>
+      <div class="point-lbl" style="color:${info.color}">${person}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderTickets() {
+  const c = document.getElementById('home-tickets');
+  if (!c) return;
+  const t = liveData.tickets || {};
+  const adiar  = t.adiar  || { label: 'Adiar tarefa 3 dias', cost: 5 };
+  const trocar = t.trocar || { label: 'Trocar dia fixo desta tarefa', cost: 5 };
+  c.innerHTML = `
+    <div class="ticket-row">
+      <div class="ticket-title">🎫 ${adiar.label}</div>
+      <div class="ticket-cost"><input type="number" min="1" value="${adiar.cost}" onchange="updateTicketCost('adiar',this.value)"> pts</div>
+      <button class="ticket-btn" onclick="openTicketModal('adiar')">Resgatar</button>
+    </div>
+    <div class="ticket-row">
+      <div class="ticket-title">🎫 ${trocar.label}</div>
+      <div class="ticket-cost"><input type="number" min="1" value="${trocar.cost}" onchange="updateTicketCost('trocar',this.value)"> pts</div>
+      <button class="ticket-btn" onclick="openTicketModal('trocar')">Resgatar</button>
+    </div>`;
+}
+
+window.updateTicketCost = function(key, val) {
+  const cost = Math.max(1, parseInt(val) || 1);
+  update(ref(db, `tickets/${key}`), { cost });
+};
+
+window.openTicketModal = function(type) {
+  const modalId  = type === 'adiar' ? 'ticket-adiar-modal' : 'ticket-trocar-modal';
+  const chipsId  = type === 'adiar' ? 'adiar-person-chips' : 'trocar-person-chips';
+  const selectId = type === 'adiar' ? 'adiar-task-select'  : 'trocar-task-select';
+  document.querySelectorAll(`#${chipsId} .chip`).forEach(c => { c.classList.remove('sel'); c.style.background=''; c.style.color=''; });
+  document.getElementById(selectId).innerHTML = '<option value="">Escolha a pessoa primeiro</option>';
+  document.getElementById(modalId).classList.add('open');
+};
+
+window.fillTaskSelect = function(chipsGroupId, selectId) {
+  const person = getChipVal(chipsGroupId);
+  const select = document.getElementById(selectId);
+  if (!person) { select.innerHTML = '<option value="">Escolha a pessoa primeiro</option>'; return; }
+  const tasks = Object.entries(liveData.tasks[safeKey(person)] || {});
+  if (!tasks.length) { select.innerHTML = '<option value="">Nenhuma tarefa</option>'; return; }
+  select.innerHTML = tasks.map(([id, t]) => `<option value="${id}">${t.icon || '📌'} ${t.text}</option>`).join('');
+};
+
+window.redeemAdiar = function() {
+  const person = getChipVal('adiar-person-chips');
+  const taskId = document.getElementById('adiar-task-select').value;
+  if (!person || !taskId) { toast('Escolha pessoa e tarefa!'); return; }
+  const cost = (liveData.tickets.adiar && liveData.tickets.adiar.cost) || 5;
+  const key  = safeKey(person);
+  const pts  = liveData.points[key] || 0;
+  if (pts < cost) { toast('Pontos insuficientes!'); return; }
+  const d = new Date(); d.setDate(d.getDate() + 3);
+  update(ref(db, `tasks/${key}/${taskId}`), { postponeUntil: isoDate(d) });
+  update(ref(db, 'points'), { [key]: pts - cost });
+  toast('Tarefa adiada por 3 dias ✓');
+  closeModal('ticket-adiar-modal');
+};
+
+window.redeemTrocar = function() {
+  const person = getChipVal('trocar-person-chips');
+  const taskId = document.getElementById('trocar-task-select').value;
+  const newDay = parseInt(document.getElementById('trocar-day-select').value);
+  if (!person || !taskId) { toast('Escolha pessoa e tarefa!'); return; }
+  const cost = (liveData.tickets.trocar && liveData.tickets.trocar.cost) || 5;
+  const key  = safeKey(person);
+  const pts  = liveData.points[key] || 0;
+  if (pts < cost) { toast('Pontos insuficientes!'); return; }
+  update(ref(db, `tasks/${key}/${taskId}`), { weekday: newDay });
+  update(ref(db, 'points'), { [key]: pts - cost });
+  toast('Dia fixo alterado ✓');
+  closeModal('ticket-trocar-modal');
+};
+
+// ─────────────────────────────────────────────
+//  LIXO
+// ─────────────────────────────────────────────
+function renderLixo() {
+  const c = document.getElementById('home-lixo');
+  if (!c) return;
+  const entries = Object.entries(liveData.lixo || {});
+  if (!entries.length) { c.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:14px;text-align:center">Carregando...</div>'; return; }
+  c.innerHTML = entries.map(([id, l]) => {
+    const p = PEOPLE[l.responsavel];
+    return `<div class="lixo-row">
+      <div class="lixo-emoji">${l.emoji || '🗑️'}</div>
+      <div class="lixo-body">
+        <div class="lixo-title">${l.label}</div>
+        <div class="lixo-sub" style="${p ? `color:${p.color}` : ''}">${p ? p.emoji + ' ' : ''}${l.responsavel}</div>
+      </div>
+      ${l.full
+        ? `<button class="lixo-btn" style="background:var(--success)" onclick="markLixoDone('${id}')">Marcar feito</button>`
+        : `<button class="lixo-btn" style="background:var(--danger)" onclick="markLixoFull('${id}')">Lixo cheio!</button>`}
+    </div>`;
+  }).join('');
+}
+
+window.markLixoFull = function(id) {
+  update(ref(db, `lixo/${id}`), { full: true });
+  toast('Aviso enviado! 🗑️');
+};
+
+window.markLixoDone = function(id) {
+  update(ref(db, `lixo/${id}`), { full: false, lastTakenDate: isoDate(new Date()) });
+  toast('Lixo trocado ✓');
+};
+
+function renderLixoAlert() {
+  const c = document.getElementById('lixo-alert-banner');
+  if (!c) return;
+  const full = Object.entries(liveData.lixo || {}).filter(([, l]) => l.full);
+  if (!full.length) { c.innerHTML = ''; return; }
+  c.innerHTML = full.map(([id, l]) => {
+    const p = PEOPLE[l.responsavel];
+    return `<div class="alert-banner">
+      <div class="alert-banner-icon">${l.emoji || '🗑️'}</div>
+      <div class="alert-banner-text">${l.label} está cheio! ${p ? p.emoji + ' ' : ''}${l.responsavel} precisa trocar.</div>
+      <button class="alert-banner-btn" onclick="markLixoDone('${id}')">Feito ✓</button>
+    </div>`;
+  }).join('');
+}
+
+// ─────────────────────────────────────────────
+//  TASKS
+// ─────────────────────────────────────────────
+let currentTaskPerson = null;
+
+window.selectTaskPerson = function(person, btn) {
+  document.querySelectorAll('#task-person-bar .p-pill').forEach(p => {
+    p.classList.remove('active'); p.style.background = ''; p.style.color = '';
+  });
+  btn.classList.add('active');
+  btn.style.background = PEOPLE[person].color;
+  btn.style.color = 'white';
+  currentTaskPerson = person;
+  renderTaskContent();
+};
+
+function renderTaskContent() {
+  if (!currentTaskPerson) return;
+  const p     = PEOPLE[currentTaskPerson];
+  const key   = safeKey(currentTaskPerson);
+  const tasks = Object.entries(liveData.tasks[key] || {});
+  const done  = tasks.filter(([,t]) => t.done).length;
+  const pct   = tasks.length ? Math.round(done / tasks.length * 100) : 0;
+
+  const c = document.getElementById('task-content');
+  c.innerHTML = `
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 16px 10px">
+        <div style="width:42px;height:42px;border-radius:50%;background:${p.soft};color:${p.color};display:flex;align-items:center;justify-content:center;font-size:20px">${p.emoji}</div>
+        <div style="flex:1">
+          <div style="font-size:16px;font-weight:700">${currentTaskPerson}</div>
+          <div style="font-size:12px;color:var(--muted)">${done}/${tasks.length} concluídas</div>
+        </div>
+        <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:700;color:${p.color}">${pct}%</div>
+      </div>
+      <div class="prog-wrap"><div class="prog-fill" style="width:${pct}%;background:${p.color}"></div></div>
+      <div id="task-rows">
+        ${tasks.length ? tasks.map(([id, t]) => taskRowHTML(id, t, p)).join('') : '<div style="padding:16px;color:var(--muted);font-size:14px;text-align:center">Nenhuma tarefa. Adicione abaixo ↓</div>'}
+      </div>
+      <div class="add-row" style="border-top:1px solid var(--border)">
+        <input class="add-input" id="new-task-input" placeholder="Nova tarefa..." onkeydown="if(event.key==='Enter')addTask()">
+        <button class="add-btn" style="background:${p.color}" onclick="addTask()">Add</button>
+      </div>
+    </div>`;
+}
+
+function taskRowHTML(id, t, p) {
+  const wd = t.weekday ?? 0;
+  const options = WEEK_DAYS.map((d, i) => `<option value="${i}" ${i === wd ? 'selected' : ''}>${d.slice(0,3)}</option>`).join('');
+  return `<div class="task-row" onclick="toggleTask('${safeKey(currentTaskPerson)}','${id}')">
+    <div class="task-check ${t.done?'done':''}" style="${t.done?`background:${p.color}`:''}">
+      ${t.done ? '✓' : ''}
+    </div>
+    <span class="task-label ${t.done?'done':''}">${t.icon||'📌'} ${t.text}</span>
+    <select class="wd-select" onclick="event.stopPropagation()" onchange="setTaskWeekday('${safeKey(currentTaskPerson)}','${id}',this.value)">${options}</select>
+    <div class="task-actions" onclick="event.stopPropagation()">
+      <button class="icon-btn" onclick="deleteTask('${safeKey(currentTaskPerson)}','${id}')" title="Apagar">🗑️</button>
+    </div>
+  </div>`;
+}
+
+window.toggleTask = function(personKey, id) {
+  const task = liveData.tasks[personKey]?.[id];
+  if (!task) return;
+  const newDone  = !task.done;
+  const todayISO = isoDate(new Date());
+  update(ref(db, `tasks/${personKey}/${id}`), { done: newDone, [`completions/${todayISO}`]: newDone ? true : null });
+
+  const pts   = liveData.points[personKey] || 0;
+  const delta = newDone ? 1 : -1;
+  update(ref(db, 'points'), { [personKey]: Math.max(0, pts + delta) });
+};
+
+window.setTaskWeekday = function(personKey, id, weekday) {
+  update(ref(db, `tasks/${personKey}/${id}`), { weekday: parseInt(weekday) });
+  toast('Dia fixo atualizado ✓');
+};
+
+window.addTask = function() {
+  const input = document.getElementById('new-task-input');
+  const text  = input.value.trim();
+  if (!text || !currentTaskPerson) return;
+  const key = safeKey(currentTaskPerson);
+  push(ref(db, `tasks/${key}`), { text, done: false, icon: '📌', weekday: DEFAULT_WEEKDAY[currentTaskPerson] ?? 0, createdAt: new Date().toISOString() });
+  input.value = '';
+  toast('Tarefa adicionada ✓');
+};
+
+window.deleteTask = function(personKey, id) {
+  if (!confirm('Apagar esta tarefa?')) return;
+  remove(ref(db, `tasks/${personKey}/${id}`));
+  toast('Tarefa removida');
+};
+
+// ─────────────────────────────────────────────
+//  AVISOS (Lembretes)
+// ─────────────────────────────────────────────
+let editingLemId = null;
+
+window.openLemModal = function(id) {
+  editingLemId = id || null;
+  const modal  = document.getElementById('lem-modal');
+  const titleEl = document.getElementById('lem-modal-title');
+  document.getElementById('lem-text-input').value = '';
+  document.querySelectorAll('#lem-who-chips .chip').forEach(c => { c.classList.remove('sel'); c.style.background=''; c.style.color=''; });
+  document.querySelectorAll('#lem-exp-chips .chip').forEach(c => { c.classList.remove('sel'); c.style.background=''; c.style.color=''; });
+  const neverChip = document.querySelector('#lem-exp-chips .chip[data-v="0"]');
+  selPlainChip(neverChip, 'lem-exp-chips');
+
+  if (id) {
+    const l = liveData.lembretes[id];
+    titleEl.textContent = 'Editar aviso';
+    document.getElementById('lem-text-input').value = l.text;
+    const chip = document.querySelector(`#lem-who-chips .chip[data-v="${l.who}"]`);
+    if (chip) selChip(chip, 'lem-who-chips');
+  } else {
+    titleEl.textContent = 'Novo aviso';
+  }
+  modal.classList.add('open');
+};
+
+window.saveLembrete = function() {
+  const text = document.getElementById('lem-text-input').value.trim();
+  const who  = getChipVal('lem-who-chips');
+  if (!text || !who) { toast('Preencha tudo!'); return; }
+
+  const expDays = parseInt(getChipVal('lem-exp-chips') || '0');
+  let expiresAt = null;
+  if (expDays > 0) {
+    const d = new Date();
+    d.setDate(d.getDate() + expDays);
+    expiresAt = d.toISOString();
+  }
+
+  if (editingLemId) {
+    update(ref(db, `lembretes/${editingLemId}`), { text, who, expiresAt });
+    toast('Aviso atualizado ✓');
+  } else {
+    push(ref(db, 'lembretes'), { text, who, done: false, icon: '🔔', expiresAt, createdAt: new Date().toISOString() });
+    toast('Aviso adicionado ✓');
+  }
+  closeModal('lem-modal');
+};
+
+function cleanupExpiredAvisos() {
+  const now = new Date();
+  Object.entries(liveData.lembretes).forEach(([id, l]) => {
+    if (l.expiresAt && new Date(l.expiresAt) < now) {
+      remove(ref(db, `lembretes/${id}`));
+    }
+  });
+}
+
+function renderLembretes() {
+  const c = document.getElementById('lem-list');
+  const entries = Object.entries(liveData.lembretes);
+  if (!entries.length) { c.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Nenhum aviso ainda.</div>'; return; }
+  c.innerHTML = entries.map(([id, l]) => {
+    const p = PEOPLE[l.who];
+    let expInfo = '';
+    if (l.expiresAt) {
+      const days = Math.max(0, Math.ceil((new Date(l.expiresAt) - new Date()) / 86400000));
+      expInfo = ` · expira em ${days}d`;
+    }
+    return `<div class="lem-row">
+      <div class="lem-icon">${l.icon || '🔔'}</div>
+      <div class="lem-body">
+        <div class="lem-text ${l.done?'done':''}">${l.text}</div>
+        <div class="lem-who" style="${p?`color:${p.color}`:''}">
+          ${p ? p.emoji+' ' : ''}${l.who}${expInfo}
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0;align-items:center">
+        <button class="icon-btn" onclick="openLemModal('${id}')" title="Editar">✏️</button>
+        <button class="icon-btn" onclick="deleteLem('${id}')" title="Apagar">🗑️</button>
+        <div class="lem-check ${l.done?'done':''}" onclick="toggleLem('${id}')">
+          ${l.done ? '✓' : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.toggleLem = function(id) {
+  const l = liveData.lembretes[id];
+  if (!l) return;
+  update(ref(db, `lembretes/${id}`), { done: !l.done });
+};
+
+window.deleteLem = function(id) {
+  if (!confirm('Apagar este aviso?')) return;
+  remove(ref(db, `lembretes/${id}`));
+  toast('Aviso removido');
+};
+
+// ─────────────────────────────────────────────
+//  SHOPPING
+// ─────────────────────────────────────────────
+let pendingBuyId = null;
+let currentShopFilter = 'Todos';
+
+window.setShopFilter = function(filter, btn) {
+  currentShopFilter = filter;
+  document.querySelectorAll('#shop-filter-bar .f-pill').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderShopping();
+};
+
+window.addShopItem = function() {
+  const input = document.getElementById('shop-input');
+  const item  = input.value.trim();
+  if (!item) return;
+  const who = getChipVal('shop-add-who-chips') || 'Geral';
+  push(ref(db, 'shopping'), { item, who, bought: false, addedAt: new Date().toISOString() });
+  input.value = '';
+  toast('Item adicionado ✓');
+};
+
+window.openBuyModal = function(id) {
+  pendingBuyId = id;
+  const s = liveData.shopping[id];
+  document.getElementById('shop-modal-item').textContent = s ? `"${s.item}"` : '';
+  document.querySelectorAll('#shop-who-chips .chip').forEach(c => { c.classList.remove('sel'); c.style.background=''; c.style.color=''; });
+  document.getElementById('shop-modal').classList.add('open');
+};
+
+window.confirmBought = function() {
+  const who = getChipVal('shop-who-chips');
+  if (!who) { toast('Escolha quem comprou!'); return; }
+  const s = liveData.shopping[pendingBuyId];
+  if (!s) return;
+
+  // Move to history
+  push(ref(db, 'history'), {
+    item: s.item, who, boughtAt: new Date().toISOString()
+  });
+  remove(ref(db, `shopping/${pendingBuyId}`));
+  toast(`${who} comprou "${s.item}" ✓`);
+  closeModal('shop-modal');
+};
+
+window.deleteShopItem = function(id) {
+  remove(ref(db, `shopping/${id}`));
+  toast('Item removido');
+};
+
+function renderShopping() {
+  const c = document.getElementById('shop-list');
+  let pending = Object.entries(liveData.shopping).filter(([,s]) => !s.bought);
+  if (currentShopFilter !== 'Todos') {
+    pending = pending.filter(([,s]) => (s.who || 'Geral') === currentShopFilter);
+  }
+  if (!pending.length) { c.innerHTML = '<div style="padding:16px;text-align:center;color:var(--muted);font-size:14px">Lista vazia! 🎉</div>'; return; }
+  c.innerHTML = pending.map(([id, s]) => {
+    const who = s.who || 'Geral';
+    const p = PEOPLE[who];
+    const tagStyle = p ? `background:${p.soft};color:${p.color}` : 'background:var(--bg);color:var(--muted)';
+    return `
+    <div class="shop-row">
+      <div class="shop-check" onclick="openBuyModal('${id}')"></div>
+      <div class="shop-label">${s.item}</div>
+      <div class="shop-tag" style="${tagStyle}">${who}</div>
+      <button class="icon-btn" onclick="deleteShopItem('${id}')">🗑️</button>
+    </div>`;
+  }).join('');
+}
+
+function renderHistory() {
+  const c = document.getElementById('shop-hist');
+  const entries = Object.entries(liveData.history).sort(([,a],[,b]) => new Date(b.boughtAt)-new Date(a.boughtAt));
+  if (!entries.length) { c.innerHTML = '<div style="padding:16px;text-align:center;color:var(--muted);font-size:14px">Nenhuma compra registrada ainda.</div>'; return; }
+  c.innerHTML = entries.map(([id, h]) => {
+    const p = PEOPLE[h.who];
+    return `<div class="hist-row">
+      <div style="font-size:18px">✅</div>
+      <div class="hist-label">${h.item}</div>
+      <div class="hist-meta" style="color:${p ? p.color : 'var(--muted)'}">
+        ${p ? p.emoji : ''} ${h.who}<br>${fmtDate(h.boughtAt)}
+      </div>
+      <button class="icon-btn" onclick="deleteHist('${id}')">🗑️</button>
+    </div>`;
+  }).join('');
+}
+
+window.deleteHist = function(id) {
+  remove(ref(db, `history/${id}`));
+};
+
+// ─────────────────────────────────────────────
+//  MACHINE
+// ─────────────────────────────────────────────
+let pendingSlotKey = null;
+
+function renderMachine() {
+  const wk  = getWeekKey();
+  const grid = document.getElementById('machine-grid');
+  grid.innerHTML = WEEK_DAYS.map(day => {
+    const slotsHTML = SLOTS.map(slot => {
+      const key   = `${wk}_${day}_${slot}`.replace(/\s/g,'_');
+      const owner = liveData.machine[key];
+      const p     = owner ? PEOPLE[owner] : null;
+      return `<button class="slot-btn ${owner ? 'taken' : 'free'}"
+        style="${owner ? `background:${p.color}` : ''}"
+        onclick="openSlotModal('${day}','${slot}','${key}')">
+        ${owner ? `${p.emoji} ${owner.split(' ')[0]}` : slot}
+      </button>`;
+    }).join('');
+    return `<div class="day-card">
+      <div class="day-head">${day}</div>
+      <div class="slots-row">${slotsHTML}</div>
+    </div>`;
+  }).join('');
+}
+
+window.openSlotModal = function(day, slot, key) {
+  pendingSlotKey = key;
+  const wk    = getWeekKey();
+  const owner = liveData.machine[key];
+  document.getElementById('slot-modal-title').textContent = `${day} — ${slot}`;
+  document.getElementById('slot-cancel-btn').style.display = owner ? '' : 'none';
+  document.querySelectorAll('#slot-who-chips .chip').forEach(c => { c.classList.remove('sel'); c.style.background=''; c.style.color=''; });
+  if (owner) {
+    const chip = document.querySelector(`#slot-who-chips .chip[data-v="${owner}"]`);
+    if (chip) selChip(chip, 'slot-who-chips');
+  }
+  document.getElementById('slot-modal').classList.add('open');
+};
+
+window.confirmSlot = function() {
+  const who = getChipVal('slot-who-chips');
+  if (!who) { toast('Escolha quem vai usar!'); return; }
+  set(ref(db, `machine/${pendingSlotKey}`), who);
+  toast(`Reservado para ${who} ✓`);
+  closeModal('slot-modal');
+};
+
+window.cancelSlot = function() {
+  remove(ref(db, `machine/${pendingSlotKey}`));
+  toast('Reserva cancelada');
+  closeModal('slot-modal');
+};
+
+// ─────────────────────────────────────────────
+//  REGRAS
+// ─────────────────────────────────────────────
+function renderRegras() {
+  const c = document.getElementById('regras-list');
+  const entries = Object.entries(liveData.regras).sort(([,a],[,b]) => new Date(a.createdAt||0)-new Date(b.createdAt||0));
+  if (!entries.length) { c.innerHTML = ''; return; }
+  c.innerHTML = entries.map(([id, r], i) => `
+    <div class="regra-card ${r.important ? 'important' : ''}">
+      <div class="regra-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="regra-text">${r.important ? '⚠️ ' : ''}${r.text}</div>
+      <button class="regra-del" onclick="deleteRegra('${id}')" title="Remover">✕</button>
+    </div>`).join('');
+}
+
+window.addRegra = function(important) {
+  const input = document.getElementById('regra-input');
+  const text  = input.value.trim();
+  if (!text) { toast('Escreva uma regra primeiro!'); return; }
+  push(ref(db, 'regras'), { text, important: !!important, createdAt: new Date().toISOString() })
+    .then(() => {
+      input.value = '';
+      toast('Regra adicionada ✓');
+    })
+    .catch(err => toast('Erro ao adicionar: ' + err.message));
+};
+
+window.exportRegrasPNG = function() {
+  const target = document.getElementById('regras-list');
+  if (!target || !target.children.length) { toast('Nenhuma regra para exportar'); return; }
+  if (typeof window.html2canvas === 'undefined') { toast('Erro ao carregar exportador'); return; }
+  window.html2canvas(target, { backgroundColor: '#F2F1ED', scale: 2 }).then(canvas => {
+    const link = document.createElement('a');
+    link.download = 'regras-da-casa.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('Imagem exportada ✓');
+  }).catch(() => toast('Erro ao exportar imagem'));
+};
+
+window.deleteRegra = function(id) {
+  if (!confirm('Remover esta regra?')) return;
+  remove(ref(db, `regras/${id}`));
+  toast('Regra removida');
+};
+
+// ─────────────────────────────────────────────
+//  MODAL CLOSE
+// ─────────────────────────────────────────────
+window.closeModal = function(id) {
+  document.getElementById(id).classList.remove('open');
+};
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ─────────────────────────────────────────────
+//  BOOT
+// ─────────────────────────────────────────────
+(async () => {
+  await seedIfEmpty();
+  await seedExtras();
+  startListeners();
+})();
+</script>
+</body>
+</html>
