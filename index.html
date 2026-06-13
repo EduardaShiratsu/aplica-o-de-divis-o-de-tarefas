@@ -554,9 +554,24 @@ body {
   <div class="add-regra-wrap">
     <textarea class="add-regra-input" id="regra-input" rows="2" placeholder="Escrever nova regra..."></textarea>
     <div class="add-regra-row">
-      <button class="btn-regra btn-regra-ok" type="button" onclick="addRegra(false)">Adicionar</button>
-      <button class="btn-regra btn-regra-imp" type="button" onclick="addRegra(true)">⚠️ Importante</button>
-      <button class="btn-regra export-btn" type="button" onclick="exportRegrasPNG()">📷 PNG</button>
+      <button class="btn-regra btn-regra-ok" type="button" onclick="addRegraTo('regras','regra-input',false)">Adicionar</button>
+      <button class="btn-regra btn-regra-imp" type="button" onclick="addRegraTo('regras','regra-input',true)">⚠️ Importante</button>
+    </div>
+    <div class="add-regra-row">
+      <button class="btn-regra export-btn" type="button" onclick="exportRegrasPDF('casa')">📄 Baixar Regras da Casa (PDF)</button>
+    </div>
+  </div>
+
+  <div class="sec-label" style="margin-top: 28px;">Regras para convidados</div>
+  <div id="regras-convidados-list"></div>
+  <div class="add-regra-wrap">
+    <textarea class="add-regra-input" id="regra-convidado-input" rows="2" placeholder="Escrever nova regra para convidados..."></textarea>
+    <div class="add-regra-row">
+      <button class="btn-regra btn-regra-ok" type="button" onclick="addRegraTo('regrasConvidados','regra-convidado-input',false)">Adicionar</button>
+      <button class="btn-regra btn-regra-imp" type="button" onclick="addRegraTo('regrasConvidados','regra-convidado-input',true)">⚠️ Importante</button>
+    </div>
+    <div class="add-regra-row">
+      <button class="btn-regra export-btn" type="button" onclick="exportRegrasPDF('convidados')">📄 Baixar Regras de Convidados (PDF)</button>
     </div>
   </div>
 </div>
@@ -696,7 +711,7 @@ body {
 <div class="toast" id="toast"></div>
 
 <!-- ═══════════════════════════════ FIREBASE + JS ═══════════════════════════════ -->
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script type="module">
 import { initializeApp }                      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getDatabase, ref, onValue, set, push, update, remove, get }
@@ -729,7 +744,7 @@ const SLOTS      = ['Manhã','Tarde','Noite'];
 const DEFAULT_WEEKDAY = { 'Eduarda': 1, 'Ana Luiza': 6, 'Leander': 4 }; // Terça, Domingo, Sexta
 
 // ── STATE (live) ──
-let liveData = { tasks: {}, lembretes: {}, shopping: {}, history: {}, machine: {}, regras: {}, lixo: {}, points: {}, tickets: {} };
+let liveData = { tasks: {}, lembretes: {}, shopping: {}, history: {}, machine: {}, regras: {}, regrasConvidados: {}, lixo: {}, points: {}, tickets: {} };
 
 // ── DATE HELPERS ──
 function todayStr() {
@@ -936,6 +951,20 @@ async function seedExtras() {
     });
   }
 
+  const regrasConvidadosSnap = await get(ref(db, 'regrasConvidados'));
+  if (!regrasConvidadosSnap.exists()) {
+    const defaultRegrasConvidados = [
+      { text: 'Respeite os espaços e pertences das moradoras' },
+      { text: 'Barulho reduzido após as 22h' },
+      { text: 'Mantenha os ambientes limpos durante a visita' },
+      { text: 'Não use mantimentos pessoais sem autorização' },
+      { text: 'Comunique com antecedência se for dormir' },
+    ];
+    for (const r of defaultRegrasConvidados) {
+      await push(ref(db, 'regrasConvidados'), { ...r, createdAt: new Date().toISOString() });
+    }
+  }
+
   // Migrate existing tasks without a fixed weekday
   const tasksSnap = await get(ref(db, 'tasks'));
   const tasks = tasksSnap.val() || {};
@@ -996,6 +1025,12 @@ function startListeners() {
   onValue(ref(db, 'regras'), snap => {
     liveData.regras = snap.val() || {};
     renderRegras();
+  });
+
+  // REGRAS PARA CONVIDADOS
+  onValue(ref(db, 'regrasConvidados'), snap => {
+    liveData.regrasConvidados = snap.val() || {};
+    renderRegrasConvidados();
   });
 
   // LIXO
@@ -1624,23 +1659,31 @@ window.cancelSlot = function() {
 // ─────────────────────────────────────────────
 //  REGRAS
 // ─────────────────────────────────────────────
-function renderRegras() {
-  const c = document.getElementById('regras-list');
-  const entries = Object.entries(liveData.regras).sort(([,a],[,b]) => new Date(a.createdAt||0)-new Date(b.createdAt||0));
+function renderRegrasGeneric(containerId, data, node) {
+  const c = document.getElementById(containerId);
+  const entries = Object.entries(data).sort(([,a],[,b]) => new Date(a.createdAt||0)-new Date(b.createdAt||0));
   if (!entries.length) { c.innerHTML = ''; return; }
   c.innerHTML = entries.map(([id, r], i) => `
     <div class="regra-card ${r.important ? 'important' : ''}">
       <div class="regra-num">${String(i+1).padStart(2,'0')}</div>
       <div class="regra-text">${r.important ? '⚠️ ' : ''}${r.text}</div>
-      <button class="regra-del" onclick="deleteRegra('${id}')" title="Remover">✕</button>
+      <button class="regra-del" onclick="deleteRegraNode('${node}','${id}')" title="Remover">✕</button>
     </div>`).join('');
 }
 
-window.addRegra = function(important) {
-  const input = document.getElementById('regra-input');
+function renderRegras() {
+  renderRegrasGeneric('regras-list', liveData.regras, 'regras');
+}
+
+function renderRegrasConvidados() {
+  renderRegrasGeneric('regras-convidados-list', liveData.regrasConvidados, 'regrasConvidados');
+}
+
+window.addRegraTo = function(node, inputId, important) {
+  const input = document.getElementById(inputId);
   const text  = input.value.trim();
   if (!text) { toast('Escreva uma regra primeiro!'); return; }
-  push(ref(db, 'regras'), { text, important: !!important, createdAt: new Date().toISOString() })
+  push(ref(db, node), { text, important: !!important, createdAt: new Date().toISOString() })
     .then(() => {
       input.value = '';
       toast('Regra adicionada ✓');
@@ -1648,22 +1691,62 @@ window.addRegra = function(important) {
     .catch(err => toast('Erro ao adicionar: ' + err.message));
 };
 
-window.exportRegrasPNG = function() {
-  const target = document.getElementById('regras-list');
-  if (!target || !target.children.length) { toast('Nenhuma regra para exportar'); return; }
-  if (typeof window.html2canvas === 'undefined') { toast('Erro ao carregar exportador'); return; }
-  window.html2canvas(target, { backgroundColor: '#F2F1ED', scale: 2 }).then(canvas => {
-    const link = document.createElement('a');
-    link.download = 'regras-da-casa.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    toast('Imagem exportada ✓');
-  }).catch(() => toast('Erro ao exportar imagem'));
+window.exportRegrasPDF = function(type) {
+  const isConvidados = type === 'convidados';
+  const data = isConvidados ? liveData.regrasConvidados : liveData.regras;
+  const entries = Object.entries(data).sort(([,a],[,b]) => new Date(a.createdAt||0)-new Date(b.createdAt||0));
+  if (!entries.length) { toast('Nenhuma regra para exportar'); return; }
+  if (typeof window.jspdf === 'undefined') { toast('Erro ao carregar exportador'); return; }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+  const pageWidth  = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 50;
+  const lineHeight = 18;
+  let y = 70;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(22);
+  doc.setTextColor(30, 30, 30);
+  doc.text(isConvidados ? 'Regras para Convidados' : 'Regras da Casa', margin, y);
+  y += 10;
+  doc.setDrawColor(200);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 30;
+
+  doc.setFontSize(12);
+  entries.forEach(([, r], i) => {
+    const num = String(i + 1).padStart(2, '0');
+    const prefix = `${num}. ${r.important ? '⚠️ ' : ''}`;
+    doc.setFont('helvetica', r.important ? 'bold' : 'normal');
+    const lines = doc.splitTextToSize(prefix + r.text, pageWidth - margin * 2 - 16);
+    const blockHeight = lines.length * lineHeight + 14;
+
+    if (y + blockHeight > pageHeight - margin) {
+      doc.addPage();
+      y = 60;
+    }
+
+    if (r.important) {
+      doc.setFillColor(255, 251, 235);
+      doc.setDrawColor(253, 230, 138);
+      doc.roundedRect(margin - 8, y - 14, pageWidth - (margin - 8) * 2, blockHeight, 4, 4, 'FD');
+    }
+
+    doc.setTextColor(r.important ? 146 : 30, r.important ? 64 : 30, r.important ? 14 : 30);
+    lines.forEach((line, li) => doc.text(line, margin, y + li * lineHeight));
+    doc.setTextColor(30, 30, 30);
+    y += blockHeight + 6;
+  });
+
+  doc.save(isConvidados ? 'regras-para-convidados.pdf' : 'regras-da-casa.pdf');
+  toast('PDF exportado ✓');
 };
 
-window.deleteRegra = function(id) {
+window.deleteRegraNode = function(node, id) {
   if (!confirm('Remover esta regra?')) return;
-  remove(ref(db, `regras/${id}`));
+  remove(ref(db, `${node}/${id}`));
   toast('Regra removida');
 };
 
