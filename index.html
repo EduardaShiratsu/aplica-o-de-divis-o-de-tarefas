@@ -33,13 +33,14 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-html, body { height: 100%; }
+html { height: 100%; }
 
 body {
   font-family: 'DM Sans', sans-serif;
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
+  min-height: 100%;
   padding-bottom: calc(var(--nav-h) + 100px + env(safe-area-inset-bottom));
 }
 
